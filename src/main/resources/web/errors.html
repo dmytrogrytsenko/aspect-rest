@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Aspect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href='http://fonts.googleapis.com/css?family=Chicle&subset=latin' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Mono&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans+Caption:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="container">
+    <div id="logo">Aspect</div>
+    <div id="slogan">explore all points of view</div>
+    <hr/>
+    <h1>Aspect REST API Documentation</h1>
+    <h2>Error Codes & Responses</h2>
+
+    <h3>Response</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="20%" colspan="2">Status</th>
+            <th width="15%">Code</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span class="label label-success">200</span></td>
+            <td>OK</td>
+            <td>&nbsp;</td>
+            <td>The operation is performed successfully.</td>
+        </tr>
+        <tr>
+            <td rowspan="13"><span class="label label-danger">400</span></td>
+            <td rowspan="13">Bad Request</td>
+            <td><button type="button" class="btn btn-link btn-xs">CORRUPT_REQUEST_ENCODING</button></td>
+            <td>The request's encoding is corrupt.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MALFORMED_FORM_FIELD</button></td>
+            <td>The form field was malformed.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MALFORMED_HEADER</button></td>
+            <td>The value of HTTP header was malformed.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MALFORMED_QUERY_PARAM</button></td>
+            <td>The query parameter was malformed.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MALFORMED_REQUEST_CONTENT</button></td>
+            <td>The request content was malformed.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MISSING_COOKIE</button></td>
+            <td>Request is missing required cookie.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MISSING_FORM_FIELD</button></td>
+            <td>Request is missing required form field.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MISSING_HEADER</button></td>
+            <td>Request is missing required HTTP header.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">MISSING_QUERY_PARAM</button></td>
+            <td>Request is missing required query parameter.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">REQUEST_ENTITY_EXPECTED</button></td>
+            <td>Request entity expected but not supplied.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">SCHEME_NOT_ALLOWED</button></td>
+            <td>Uri scheme not allowed.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">VALIDATION</button></td>
+            <td>The request content validation is failed.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">UNSUPPORTED_REQUEST_ENCODING</button></td>
+            <td>The request's Content-Encoding is not supported.</td>
+        </tr>
+        <tr>
+            <td rowspan="2"><span class="label label-danger">401</span></td>
+            <td rowspan="2">Unauthorized</td>
+            <td><button type="button" class="btn btn-link btn-xs">CREDENTIALS_MISSING</button></td>
+            <td>The resource requires authentication, which was not supplied with the request.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">CREDENTIALS_REJECTED</button></td>
+            <td>The supplied authentication is invalid.</td>
+        </tr>
+        <tr>
+            <td><span class="label label-danger">403</span></td>
+            <td>Forbidden</td>
+            <td><button type="button" class="btn btn-link btn-xs">ACCESS_DENIED</button></td>
+            <td>The supplied authentication is not authorized to access this resource.</td>
+        </tr>
+        <tr>
+            <td rowspan="3"><span class="label label-danger">404</span></td>
+            <td rowspan="3">Not Found</td>
+            <td><button type="button" class="btn btn-link btn-xs">PROJECT_NOT_FOUND</button></td>
+            <td>Project is not found.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">RESOURCE_NOT_FOUND</button></td>
+            <td>The requested resource could not be found.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">TARGET_NOT_FOUND</button></td>
+            <td>Target is not found.</td>
+        </tr>
+        <tr>
+            <td><span class="label label-danger">405</span></td>
+            <td>Method Not Allowed</td>
+            <td><button type="button" class="btn btn-link btn-xs">METHOD_NOT_ALLOWED</button></td>
+            <td>HTTP method not allowed.</td>
+        </tr>
+        <tr>
+            <td rowspan="2"><span class="label label-danger">406</span></td>
+            <td rowspan="2">Not Acceptable</td>
+            <td><button type="button" class="btn btn-link btn-xs">UNACCEPTED_RESPONSE_CONTENT_TYPE</button></td>
+            <td>Resource representation is only available with Content-Types.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">UNACCEPTED_RESPONSE_ENCODING</button></td>
+            <td>Resource representation is only available with Content-Encodings.</td>
+        </tr>
+        <tr>
+            <td><span class="label label-danger">415</span></td>
+            <td>Unsupported Media Type</td>
+            <td><button type="button" class="btn btn-link btn-xs">UNSUPPORTED_REQUEST_CONTENT_TYPE</button></td>
+            <td>There was a problem with the requests Content-Type.</td>
+        </tr>
+        <tr>
+            <td rowspan="2"><span class="label label-danger">416</span></td>
+            <td rowspan="2">Requested Range Not Satisfiable</td>
+            <td><button type="button" class="btn btn-link btn-xs">TOO_MANY_RANGES</button></td>
+            <td>Request contains too many ranges.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">UNSATISFIABLE_RANGE</button></td>
+            <td>The requested Ranges are not satisfiable.</td>
+        </tr>
+        <tr>
+            <td rowspan="2"><span class="label label-danger">500</span></td>
+            <td rowspan="2">Internal Server Error</td>
+            <td><button type="button" class="btn btn-link btn-xs">INTERNAL_SERVER_ERROR</button></td>
+            <td>There was an internal server error.</td>
+        </tr>
+        <tr>
+            <td><button type="button" class="btn btn-link btn-xs">TIMEOUT</button></td>
+            <td>The request processing is timed out.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Response body</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="1%">Name</th>
+            <th width="10%">Type</th>
+            <th width="1%">Necessity</th>
+            <th>Description</th>
+            <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>status</td>
+            <td>Int</td>
+            <td>Required</td>
+            <td>HTTP status code.</td>
+            <td><samp>"status": 404</samp></td>
+        </tr>
+        <tr>
+            <td>code</td>
+            <td>String</td>
+            <td>Required</td>
+            <td>The error code.</td>
+            <td><samp>"code": "PROJECT_NOT_FOUND"</samp></td>
+        </tr>
+        <tr>
+            <td>message</td>
+            <td>String</td>
+            <td>Required</td>
+            <td>The error message.</td>
+            <td><samp>"message": "Project is not found."</samp></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Example of response body</h3>
+<pre>{
+    "status": 404,
+    "code": "PROJECT_NOT_FOUND",
+    "message": "Project is not found."
+}</pre>
+
+</div>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

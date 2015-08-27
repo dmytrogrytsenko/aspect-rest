@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Aspect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href='http://fonts.googleapis.com/css?family=Chicle&subset=latin' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Mono&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=PT+Sans+Caption:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="container">
+    <div id="logo">Aspect</div>
+    <div id="slogan">explore all points of view</div>
+    <hr/>
+    <h1>Aspect REST API Documentation</h1>
+    <h2>POST /login</h2>
+    <p>Login the user.</p>
+
+    <h3>Request</h3>
+    <samp>POST http://your-it.com.ua:8888/login</samp><br/>
+
+    <h3>Request body</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="1%">Name</th>
+            <th width="10%">Type</th>
+            <th width="1%">Necessity</th>
+            <th>Description</th>
+            <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>login</td>
+            <td>String</td>
+            <td>Required</td>
+            <td>The user name or email.</td>
+            <td>
+                <samp><span class="text-info">"login"</span>: <span class="text-danger">"janedoe"</span></samp><br/>
+                <samp><span class="text-info">"login"</span>: <span class="text-danger">"jane.doe@gmail.com"</span></samp>
+            </td>
+        </tr>
+        <tr>
+            <td>password</td>
+            <td>String</td>
+            <td>Required</td>
+            <td>The user password.</td>
+            <td><samp><span class="text-info">"password"</span>: <span class="text-danger">"Ae71bags&534"</span></samp></td>
+        </tr>
+        </tbody>
+    </table>
+    <h3>Example of request</h3>
+    <pre>POST http://your-it.com.ua:8888/login
+{
+    <span class="text-info">"login"</span>: <span class="text-danger">"janedoe"</span>,
+    <span class="text-info">"password"</span>: <span class="text-danger">"Ae71bags&534"</span>
+}</pre>
+
+    <h3>Response</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="20%" colspan="2">Status</th>
+            <th width="15%">Code</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span class="label label-success">200</span></td>
+            <td>OK</td>
+            <td>&nbsp;</td>
+            <td>User is logged in successfully.</td>
+        </tr>
+        <tr>
+            <td><span class="label label-danger">400</span></td>
+            <td>Bad Request</td>
+            <td><button type="button" class="btn btn-link btn-xs">VALIDATION</button></td>
+            <td>
+                <p>The request content validation is failed:</p>
+                <il>
+                    <li>Required member 'login' is empty.</li>
+                    <li>Required member 'password' is empty.</li>
+                </il>
+            </td>
+        </tr>
+        <tr>
+            <td><span class="label label-danger">401</span></td>
+            <td>Unauthorized</td>
+            <td><button type="button" class="btn btn-link btn-xs">CREDENTIALS_REJECTED</button></td>
+            <td>The supplied authentication is invalid.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>See <a href="errors.html">Error Codes & Responses</a></p>
+
+    <h3>Response body</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th width="1%">Name</th>
+            <th width="10%">Type</th>
+            <th width="1%">Necessity</th>
+            <th>Description</th>
+            <th>Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>token</td>
+            <td>String</td>
+            <td>Required</td>
+            <td>The authorization token.</td>
+            <td><samp><span class="text-info">"token"</span>: <span class="text-danger">"baabfa7d-74f5-48ab-bf14-f1fdb62d2147"</span></samp></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Example of response body</h3>
+<pre>{
+    <span class="text-info">"token"</span>: <span class="text-danger">"baabfa7d-74f5-48ab-bf14-f1fdb62d2147"</span>
+}</pre>
+
+</div>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

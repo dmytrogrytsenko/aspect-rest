@@ -1,0 +1,16 @@
+﻿body {
+    font-family: PT Sans, sans-serif;
+}
+
+#logo {
+    font-family: Chicle;
+    font-size: xx-large;
+    color: black;
+    text-shadow: 5px 5px 5px lightgray;
+}
+
+#slogan {
+    font-size: small;
+    color: black;
+    text-shadow: 5px 5px 5px lightgray;
+}
