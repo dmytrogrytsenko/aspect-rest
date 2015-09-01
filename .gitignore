@@ -1,0 +1,7 @@
+# sbt specific
+target/
+project/project/
+project/target/
+
+# Idea specific
+.idea
