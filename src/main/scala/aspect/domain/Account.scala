@@ -1,5 +1,7 @@
 package aspect.domain
 
-case class AccountHost(id: String)
+case class AccountId(underlying: String) extends AnyVal
 
-case class Account(id: String, url: String, host: AccountHost, name: String)
+case class AccountHost(id: HostId)
+
+case class Account(id: AccountId, url: String, host: AccountHost, name: String)

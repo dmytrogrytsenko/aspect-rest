@@ -2,11 +2,13 @@ package aspect.domain
 
 import org.joda.time.DateTime
 
-case class PostHost(id: String)
+case class PostId(underlying: String) extends AnyVal
 
-case class PostAuthor(id: String, url: String, name: String)
+case class PostHost(id: HostId)
 
-case class Post(id: String,
+case class PostAuthor(id: AccountId, url: String, name: String)
+
+case class Post(id: PostId,
                 url: String,
                 host: PostHost,
                 author: PostAuthor,

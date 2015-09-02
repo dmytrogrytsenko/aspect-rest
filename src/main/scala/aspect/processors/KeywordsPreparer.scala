@@ -34,15 +34,12 @@ class KeywordsPreparer extends BaseActor {
 
   def receive = {
     case Start =>
-      log.debug(s"Start")
       (for {
         targets <- TargetCollection.all
         keywords <- KeywordCollection.all
       } yield Loaded(targets.toSet, keywords.toSet)) pipeTo self
 
     case Loaded(targets, keywords) =>
-      log.debug(s"Loaded")
-
       val rows = for {
         target <- targets
         word <- target.words
@@ -50,7 +47,7 @@ class KeywordsPreparer extends BaseActor {
 
       val newKeywords = rows
         .groupBy(_._1)
-        .mapValues(row => Keyword(KeywordId(row.head._1), row.head._1, row.map(_._2.id).toSet))
+        .mapValues(row => Keyword(KeywordId(row.head._1), row.head._1, row.map(_._2.id)))
         .values
         .toSet
 
@@ -59,20 +56,21 @@ class KeywordsPreparer extends BaseActor {
       val keywordsToUpdate = (keywords.map(_.id) & newKeywords.map(_.id))
         .filterNot(id => keywords.find(_.id == id).get == newKeywords.find(_.id == id).get)
 
-      log.debug("-Delete--------------------------------------")
-      log.debug(keywordsToDelete.toString())
-      log.debug("-Insert--------------------------------------")
-      log.debug(keywordsToInsert.toString())
-      log.debug("-Update--------------------------------------")
-      log.debug(keywordsToUpdate.toString())
-      log.debug("---------------------------------------")
-
       implicit val _ = Timeout(5.seconds)
-      keywordsToDelete.foreach(id => KeywordCollection.remove(id).await)
-      keywordsToInsert.foreach(id => KeywordCollection.add(newKeywords.find(_.id == id).get).await)
-      keywordsToUpdate.foreach(id => KeywordCollection.update(id, newKeywords.find(_.id == id).get).await)
 
-      log.debug(s"Completed. Sleep $successInterval")
+      keywordsToDelete.foreach { id =>
+        log.info(s"Remove keyword $id")
+        KeywordCollection.remove(id).await
+      }
+      keywordsToInsert.foreach { id =>
+        log.info(s"Insert keyword $id")
+        KeywordCollection.add(newKeywords.find(_.id == id).get).await
+      }
+      keywordsToUpdate.foreach { id =>
+        log.info(s"Update keyword $id")
+        KeywordCollection.update(id, newKeywords.find(_.id == id).get).await
+      }
+
       scheduleOnce(successInterval, Start)
 
     case Failure(e) =>

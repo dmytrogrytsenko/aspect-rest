@@ -1,14 +1,25 @@
 package aspect.mongo
 
 import aspect.common.mongo.MongoCollection
-import aspect.domain.{AccountHost, Account}
-import reactivemongo.bson.{BSONDocumentWriter, BSONDocumentReader, BSONDocument}
+import aspect.domain.{AccountId, HostId, AccountHost, Account}
+import reactivemongo.bson._
 
-object AccountCollection extends MongoCollection[String, Account] {
+object AccountCollection extends MongoCollection[AccountId, Account] {
   val name = "accounts"
 
+  import HostCollection.HostIdReader
+  import HostCollection.HostIdWriter
+
+  implicit object AccountIdReader extends BSONReader[BSONString, AccountId] {
+    def read(bson: BSONString): AccountId = AccountId(bson.value)
+  }
+
+  implicit object AccountIdWriter extends BSONWriter[AccountId, BSONString] {
+    def write(value: AccountId): BSONString = BSONString(value.underlying)
+  }
+
   implicit object AccountHostReader extends BSONDocumentReader[AccountHost] {
-    def read(doc: BSONDocument) = AccountHost(id = doc.getAs[String]("_id").get)
+    def read(doc: BSONDocument) = AccountHost(id = doc.getAs[HostId]("_id").get)
   }
 
   implicit object AccountHostWriter extends BSONDocumentWriter[AccountHost] {
@@ -17,7 +28,7 @@ object AccountCollection extends MongoCollection[String, Account] {
 
   implicit object AccountReader extends BSONDocumentReader[Account] {
     def read(doc: BSONDocument) = Account(
-      id = doc.getAs[String]("_id").get,
+      id = doc.getAs[AccountId]("_id").get,
       url = doc.getAs[String]("url").get,
       host = doc.getAs[AccountHost]("host").get,
       name = doc.getAs[String]("name").get)

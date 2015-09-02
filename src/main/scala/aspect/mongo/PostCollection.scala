@@ -1,16 +1,29 @@
 package aspect.mongo
 
 import aspect.common.mongo.MongoCollection
-import aspect.domain.{PostAuthor, PostHost, Post}
+import aspect.domain._
 import org.joda.time.DateTime
-import reactivemongo.bson.{BSONDocumentWriter, BSONDocumentReader, BSONDocument}
+import reactivemongo.bson._
 import reactivemongo.extensions.dao.Handlers._
 
-object PostCollection extends MongoCollection[String, Post] {
+object PostCollection extends MongoCollection[PostId, Post] {
   val name = "posts"
 
+  import HostCollection.HostIdReader
+  import HostCollection.HostIdWriter
+  import AccountCollection.AccountIdReader
+  import AccountCollection.AccountIdWriter
+
+  implicit object PostIdReader extends BSONReader[BSONString, PostId] {
+    def read(bson: BSONString): PostId = PostId(bson.value)
+  }
+
+  implicit object PostIdWriter extends BSONWriter[PostId, BSONString] {
+    def write(value: PostId): BSONString = BSONString(value.underlying)
+  }
+
   implicit object PostHostReader extends BSONDocumentReader[PostHost] {
-    def read(doc: BSONDocument) = PostHost(id = doc.getAs[String]("_id").get)
+    def read(doc: BSONDocument) = PostHost(id = doc.getAs[HostId]("_id").get)
   }
 
   implicit object PostHostWriter extends BSONDocumentWriter[PostHost] {
@@ -19,7 +32,7 @@ object PostCollection extends MongoCollection[String, Post] {
 
   implicit object PostAuthorReader extends BSONDocumentReader[PostAuthor] {
     def read(doc: BSONDocument) = PostAuthor(
-      id = doc.getAs[String]("_id").get,
+      id = doc.getAs[AccountId]("_id").get,
       url = doc.getAs[String]("url").get,
       name = doc.getAs[String]("name").get)
   }
@@ -33,7 +46,7 @@ object PostCollection extends MongoCollection[String, Post] {
 
   implicit object PostReader extends BSONDocumentReader[Post] {
     def read(doc: BSONDocument) = Post(
-      id = doc.getAs[String]("_id").get,
+      id = doc.getAs[PostId]("_id").get,
       url = doc.getAs[String]("url").get,
       host = doc.getAs[PostHost]("host").get,
       author = doc.getAs[PostAuthor]("author").get,
