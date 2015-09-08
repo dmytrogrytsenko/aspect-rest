@@ -53,8 +53,7 @@ object PostCollection extends MongoCollection[PostId, Post] {
       publishTime = doc.getAs[DateTime]("publishTime").get,
       lastUpdateTime = doc.getAs[DateTime]("lastUpdateTime"),
       title = doc.getAs[String]("title"),
-      text = doc.getAs[String]("text"),
-      keywords = doc.getAs[Set[String]]("keywords"))
+      text = doc.getAs[String]("text"))
   }
 
   implicit object PostWriter extends BSONDocumentWriter[Post] {
@@ -66,8 +65,7 @@ object PostCollection extends MongoCollection[PostId, Post] {
       "publishTime" -> value.publishTime,
       "lastUpdateTime" -> value.lastUpdateTime,
       "title" -> value.title,
-      "text" -> value.text,
-      "keywords" -> value.keywords)
+      "text" -> value.text)
   }
 
 }

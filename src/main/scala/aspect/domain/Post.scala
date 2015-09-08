@@ -15,5 +15,4 @@ case class Post(id: PostId,
                 publishTime: DateTime,
                 lastUpdateTime: Option[DateTime],
                 title: Option[String],
-                text: Option[String],
-                keywords: Option[Set[String]])
+                text: Option[String])

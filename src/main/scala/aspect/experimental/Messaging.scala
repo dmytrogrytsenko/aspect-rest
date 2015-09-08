@@ -6,19 +6,56 @@ import aspect.common.actors.BaseActor
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 
-//case class Initialize(config: Config)
-//case class LinkSource(source: ActorRef)
-case class Message(id: String, parts: Map[String, Any])
-case class Send(id: String, messages: Queue[Message])
-case class Accepted(id: String)
-case class Pending(id: String)
-case class Ready(id: String, amount: Int)
-case class Received(id: String, messages: Queue[Message])
+object Messaging {
+  case class Link(exchange: ActorRef)
+
+  case class MessageId(underlying: String) extends AnyVal
+  case class Message(id: MessageId, parts: Map[String, Any])
+
+  case class CorrelationId(underlying: String) extends AnyVal
+
+  case class Send(id: CorrelationId, messages: Queue[Message])
+  case class Pending(id: CorrelationId)
+  case class Accepted(id: CorrelationId)
+
+  case class Demand(id: CorrelationId, amount: Int)
+  case class Received(id: CorrelationId, messages: Queue[Message])
+  case class Handling(id: CorrelationId)
+  case class Acknowledge(id: CorrelationId)
+}
+
+import Messaging._
+
+class Input extends BaseActor {
+  def receive = {
+    case Link(exchange) => become(linked(exchange))
+  }
+  def linked(exchange: ActorRef): Receive = {
+    case _ => ???
+  }
+}
+
+class Output extends BaseActor {
+  def receive = {
+    case Link(exchange) => become(linked(exchange))
+  }
+  def linked(exchange: ActorRef): Receive = {
+    case msg @ Send(id, messages) => exchange ! msg
+    case Accepted(id) =>
+    //case Flush => ???
+  }
+}
+
+trait ProcessingItem extends BaseActor {
+  def inputs: Map[String, Input]
+  def outputs: Map[String, Output]
+  def receive = ???
+}
 
 class Exchange extends BaseActor {
 
-  case class ProducerRequest(id: String, producer: ActorRef, var messages: Queue[Message])
-  case class ConsumerRequest(id: String, consumer: ActorRef, amount: Int, var messages: Queue[Message] = Queue.empty)
+  case class ProducerRequest(id: CorrelationId, producer: ActorRef, var messages: Queue[Message])
+  case class ConsumerRequest(id: CorrelationId, consumer: ActorRef, amount: Int, var messages: Queue[Message] = Queue.empty)
 
   var producerRequests = Queue.empty[ProducerRequest]
   var consumerRequests = Queue.empty[ConsumerRequest]
@@ -26,12 +63,12 @@ class Exchange extends BaseActor {
   def receive = {
     case Send(id, Queue()) =>
       sender() ! Accepted(id)
-    case Ready(id, amount) if amount <= 0 =>
+    case Demand(id, amount) if amount <= 0 =>
       sender() ! Received(id, Queue.empty)
     case Send(id, messages) =>
       producerRequests :+= ProducerRequest(id, sender(), messages)
       process()
-    case Ready(id, amount) =>
+    case Demand(id, amount) =>
       consumerRequests :+= ConsumerRequest(id, sender(), amount)
       process()
   }
@@ -64,15 +101,7 @@ object Messaging {
       actor
     }
   }
-  implicit class MessagingActorRef(source: ActorRef) {
-    def ~>(sink: ActorRef) = {
-      sink ! LinkSource(source)
-      sink
-    }
-  }
 }
-
-import Messaging._
 
 class NaturalNumberGenerator extends BaseActor {
   var value: Int = 1
@@ -137,7 +166,8 @@ class Flow extends BaseActor {
       val intToString = Props[IntToStringConverter].create("intToString", config)
       val sleeper = Props[Sleeper].create("sleeper", config)
       val printer = Props[Printer].create("printer", config)
-      natural ~> intToString ~> sleeper ~> printer
+      natural ~> split; split.out1 ~>              sum.in1; sum ~> intToString ~> sleeper ~> printer
+                        split.out2 ~> increment ~> sum.in2
   }
 }
 */

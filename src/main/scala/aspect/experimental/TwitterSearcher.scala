@@ -7,12 +7,6 @@ import aspect.gateways.twitter.client.{Languages, SearchTweetsRequest, TwitterCl
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object TwitterSearchRequestSource extends ClusterSingleton[TwitterSearchRequestSource]
-
-class TwitterSearchRequestSource extends BaseActor {
-  def receive = ???
-}
-
 object TwitterSearcher extends NodeSingleton[TwitterSearcher]
 
 class TwitterSearcher extends BaseActor {
