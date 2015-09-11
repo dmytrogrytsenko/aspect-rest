@@ -9,10 +9,14 @@ import scala.concurrent.duration.FiniteDuration
 
 trait BaseActor extends Actor with ActorLogging {
 
+  override implicit val log = akka.event.Logging(this)
+
   lazy val cluster = Cluster(context.system)
 
   override def aroundReceive(receive: Receive, msg: Any) : Unit =
     super.aroundReceive(LoggingReceive(receive), msg)
+
+  lazy val parent = context.parent
 
   def become(behavior: Receive, discardOld: Boolean = true) = context.become(behavior, discardOld)
 
