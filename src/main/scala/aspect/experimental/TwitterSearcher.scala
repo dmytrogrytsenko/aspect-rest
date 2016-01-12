@@ -1,13 +1,19 @@
 package aspect.experimental
 
-import aspect.common.actors.{ClusterSingleton, NodeSingleton, BaseActor}
+import aspect.common._
+import aspect.common.actors.{NodeSingleton, BaseActor}
 import aspect.common.Messages.Start
-import aspect.gateways.twitter.client.{Languages, SearchTweetsRequest, TwitterClient, TwitterAuthData}
+import aspect.domain._
+import aspect.experimental.TwitterSearcher.{Feed, GetFeed}
+import aspect.gateways.twitter.client._
+import org.joda.time.DateTime
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object TwitterSearcher extends NodeSingleton[TwitterSearcher]
+object TwitterSearcher extends NodeSingleton[TwitterSearcher] {
+  case object GetFeed
+  case class Feed(posts: List[Post])
+}
 
 class TwitterSearcher extends BaseActor {
 
@@ -16,21 +22,40 @@ class TwitterSearcher extends BaseActor {
   val accessTokenKey = "2412261271-io4CrltAOT9Ee9pj3iyZ1pe3h4EK2dnksO4Iw4u"
   val accessTokenSecret = "Zd1X8tcMIUdeYfaK30VDLB3AruJ7Z4tbDEUQ3uK23wdWQ"
 
+  lazy val auth = TwitterAuthData(consumerKey, consumerSecret, accessTokenKey, accessTokenSecret)
+  lazy val twitterClient = TwitterClient(auth)
+  lazy val request = SearchTweetsRequest(q = "apple", count = Some(10), lang = Some(Languages.English))
+
+  case object Iterate
+
+  private var posts: List[Post] = List.empty
+
+
   def receive = {
     case Start =>
-      val auth = TwitterAuthData(consumerKey, consumerSecret, accessTokenKey, accessTokenSecret)
-      val twitterClient = TwitterClient(auth)
-      val request = SearchTweetsRequest(q = "apple", count = Some(10), lang = Some(Languages.English))
+      schedule(10.seconds, Iterate)
+    case Iterate =>
       import context.dispatcher
-      val response = Await.result(twitterClient.searchTweets(request), 5.seconds)
-      println("")
-      println("------------------------------------------------------------------")
-      response.result.fold(
-        errorResult => errorResult.errors.foreach(println),
-        searchTweetsResult => searchTweetsResult
-          .statuses
-          .map(status => s"${status.id_str} - ${status.user.screen_name} - ${status.text.take(20)}")
-          .foreach(println))
-      scheduleOnce(10.seconds, Start)
+      twitterClient.searchTweets(request).pipeTo(self)
+    case response: SearchTweetsResponse =>
+      posts = response.result.fold(
+        errorResult => List.empty,
+        searchTweetsResult => searchTweetsResult.statuses.map(status => buildPost(status)))
+    case GetFeed =>
+      sender ! Feed(posts)
   }
+
+  def buildPost(status: TwitterStatus): Post =
+    Post(
+      id = PostId(status.id_str),
+      url = s"https://twitter.com/${status.user.screen_name}/status/${status.id_str}",
+      host = PostHost(HostId(status.created_at)),
+      author = PostAuthor(
+        id = AccountId(status.user.id_str),
+        url = s"https://twitter.com/${status.user.screen_name}",
+        name = status.user.name),
+      publishTime = DateTime.now, //status.created_at,
+      lastUpdateTime = None,
+      title = None,
+      text = Some(status.text))
 }

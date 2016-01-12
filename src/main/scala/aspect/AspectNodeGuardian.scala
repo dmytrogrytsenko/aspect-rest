@@ -2,6 +2,7 @@ package aspect
 
 import aspect.common.Messages.Start
 import aspect.common.actors.{BaseActor, HandlerGuardian}
+import aspect.experimental.TwitterSearcher
 import aspect.processors.KeywordsPreparer
 import aspect.repositories._
 import aspect.rest.RestGuardian
@@ -23,6 +24,7 @@ class AspectNodeGuardian extends BaseActor {
 
       if (cluster.selfRoles.contains("rest")) {
         RestGuardian.create
+        TwitterSearcher.create
       }
   }
 }
