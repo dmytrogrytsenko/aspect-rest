@@ -31,7 +31,7 @@ class GeneratorActor(output: Output[Int]) extends ReactorActor {
 
   def generate(value: Int) = {
     val id = CorrelationId.generate
-    output ! Send(id, Message.create(value))
+    output ! Send(id, Message.create("value" -> value))
     become(waitingForAccepted(id, value))
   }
 

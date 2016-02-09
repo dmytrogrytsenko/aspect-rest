@@ -1,7 +1,7 @@
 package aspect.experimental.messaging
 
-import akka.actor.ActorRef
 import aspect.common._
+import org.joda.time.DateTime
 
 import scala.collection.immutable.Queue
 
@@ -18,11 +18,23 @@ object Messages {
     def generate = MessageId(newUUID)
   }
 
-  case class Message(id: MessageId, flowId: FlowId, body: Any)
+  case class Message(id: MessageId,
+                     createdAt: DateTime,
+                     flowIds: Set[FlowId],
+                     parts: Map[String, Any],
+                     stack: List[Map[String, Any]]) {
+    def as[T](name: String) = parts(name).asInstanceOf[T]
+    def has[T](name: String) = parts.get(name).map(_.asInstanceOf[T]).contains(true)
+  }
 
   object Message {
-    def create(body: Any) = Message(MessageId.generate, FlowId.generate, body)
-    def derive(source: Message, body: Any) = Message(MessageId.generate, source.flowId, body)
+    def create(part: (String, Any)) =
+    Message(
+      id = MessageId.generate,
+      createdAt = DateTime.now,
+      flowIds = Set(FlowId.generate),
+      parts = Map(part),
+      stack = List.empty)
   }
 
   case class CorrelationId(underlying: String) extends AnyVal

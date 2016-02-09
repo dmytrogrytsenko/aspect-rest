@@ -6,6 +6,8 @@ import aspect.common._
 import aspect.common.Messages.Start
 import aspect.experimental.messaging.Messages._
 
+import scala.util.Try
+
 case class Printer(underlying: ActorRef, input: Input[Int]) extends Reactor
 
 object Printer {
@@ -34,7 +36,8 @@ class PrinterActor(input: Input[Int]) extends ReactorActor {
   }
 
   def waitingForMessage(requestId: CorrelationId): Receive = {
-    case Handle(`requestId`, msg @ Message(_, _, value: Int)) =>
+    case Handle(`requestId`, msg) if msg.has[Int]("value") =>
+      val value = msg.as[Int]("value")
       input ! Accepted(requestId)
       handle(value)
       input ! Completed(requestId)

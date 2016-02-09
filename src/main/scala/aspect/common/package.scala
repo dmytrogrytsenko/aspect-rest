@@ -1,5 +1,6 @@
 package aspect
 
+import java.security.MessageDigest
 import java.util.UUID
 
 import akka.actor._
@@ -8,16 +9,47 @@ import akka.pattern.ask
 import akka.util.Timeout
 import aspect.common.Messages.Start
 import aspect.common.actors.HandlerGuardian
-import org.joda.time.{DateTimeZone, DateTime}
+import org.joda.time.DateTime
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Await, TimeoutException, Future, ExecutionContext}
 import scala.reflect.ClassTag
-import scala.util.{Random, Failure}
+import scala.util.Failure
 
 package object common {
 
   def newUUID = UUID.randomUUID().toString
+
+  def digest(algorithm: String, value: String) =
+    MessageDigest
+      .getInstance(algorithm)
+      .digest(value.getBytes)
+      .map("%02x".format(_))
+      .mkString
+
+  def md5(value: String) = digest("MD5", value)
+
+  def sha256(value: String) = digest("SHA-256", value)
+
+  def adler32sum(value: String): Int = {
+    var a = 1
+    var b = 0
+    value.getBytes.foreach(char => {
+      a = (char + a) % 65521
+      b = (b + a) % 65521
+    })
+    (b << 16) + a
+  }
+
+  case class Shard(underlying: Int) extends AnyVal
+
+  object Shard {
+    val count = 1024
+  }
+
+  implicit class RichString(value: String) {
+    def toShard = Shard(adler32sum(sha256(value)) % Shard.count)
+  }
 
   implicit class PipedObject[T](value: T) {
     def |>[R] (f: T => R) = f(this.value)
