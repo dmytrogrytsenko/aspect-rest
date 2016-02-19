@@ -3,6 +3,7 @@ package aspect.common.actors
 import akka.actor.{Cancellable, ActorRef, ActorLogging, Actor}
 import akka.cluster.Cluster
 import akka.event.LoggingReceive
+import aspect.common.Messages.Stop
 import aspect.common._
 
 import scala.concurrent.duration.FiniteDuration
@@ -13,8 +14,10 @@ trait BaseActor extends Actor with ActorLogging {
 
   lazy val cluster = Cluster(context.system)
 
-  override def aroundReceive(receive: Receive, msg: Any) : Unit =
-    super.aroundReceive(LoggingReceive(receive), msg)
+  override def aroundReceive(body: Receive, msg: Any) : Unit = msg match {
+    case Stop if !body.isDefinedAt(msg) => stop()
+    case _ => super.aroundReceive(LoggingReceive(body), msg)
+  }
 
   lazy val parent = context.parent
 

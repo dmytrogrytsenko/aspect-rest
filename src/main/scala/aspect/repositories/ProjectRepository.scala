@@ -51,7 +51,7 @@ class ProjectRepository extends BaseActor {
     case RemoveProject(projectId) =>
       remove(projectId) map (_ => ProjectRemoved(projectId)) pipeTo sender()
 
-    case UpdateProject(projectId, name) =>
-      update(projectId, name) map (_ => ProjectUpdated(projectId)) pipeTo sender()
+    case UpdateProject(projectId, projectName) =>
+      update(projectId, projectName) map (_ => ProjectUpdated(projectId)) pipeTo sender()
   }
 }

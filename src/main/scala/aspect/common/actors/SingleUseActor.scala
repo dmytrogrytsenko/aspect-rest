@@ -18,8 +18,6 @@ trait SingleUseActor extends BaseActor {
 
   context.setReceiveTimeout(receiveTimeout)
 
-  def start(): Unit = {}
-
   def answer(msg: Any) = originalSender ! msg
 
   def complete(msg: Any) = {

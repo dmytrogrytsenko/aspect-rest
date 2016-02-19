@@ -10,6 +10,4 @@ object AspectNodeApp extends App {
   val config = ConfigFactory.load()
   val system = ActorSystem("AspectClusterSystem", config)
   system.actorOf(Props[AspectNodeGuardian], name = "guardian") ! Start
-  while (readLine() != "shutdown") { }
-  system.shutdown()
 }
