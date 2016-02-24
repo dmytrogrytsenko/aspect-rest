@@ -45,16 +45,11 @@ object Messages {
 
   case class Send(id: CorrelationId, message: Message)
   case class SendMany(id: CorrelationId, messages: Queue[Message])
-  case class Acknowledge(id: CorrelationId)
+  case class Accepted(id: CorrelationId)
 
   case class Request(id: CorrelationId)
   case class RequestMany(id: CorrelationId, amount: Int)
   case class Handle(id: CorrelationId, message: Message)
   case class HandleMany(id: CorrelationId, messages: Queue[Message])
-  case class Accepted(id: CorrelationId)
-  case class Completed(id: CorrelationId)
-
-  case class Cancel(id: CorrelationId)
-  case class Failed(id: CorrelationId, e: Throwable)
-  case class Pending(id: CorrelationId)
+  case class Acknowledge(id: CorrelationId)
 }

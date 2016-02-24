@@ -3,7 +3,7 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout noConsoleNoAnsi="true">
-                <Pattern>%cyan(%date{YYYY-MM-dd HH:mm:ss.SSS}{GMT+0}) %highlight(%-5level) | %green(%logger{0}) - %msg%n"</Pattern>
+                <Pattern>%date{YYYY-MM-dd HH:mm:ss.SSS}{GMT+0} %highlight(%-5level) | %logger{0} - %msg%n"</Pattern>
             </PatternLayout>
         </Console>
     </Appenders>

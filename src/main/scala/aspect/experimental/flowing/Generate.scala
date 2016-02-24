@@ -1,17 +1,16 @@
 package aspect.experimental.flowing
 
 import akka.actor.{Props, ActorContext}
-import aspect.common.Messages.{Stop, Start}
+import aspect.common._
+import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import Messages._
+import aspect.experimental.flowing.Messages.{Accepted, Message, Send, CorrelationId}
 
 object Generate {
-  def apply(name: String = "")(implicit context: ActorContext) = {
-    new Reactor(name) with DefaultOutput[Int] {
-      val props = Props[Generate]
+  def apply(name: String = "")(implicit context: ActorContext) =
+    new Reactor(Props[Generate], name) with DefaultOutput[Int] {
       val output = Output.default[Int]
     }
-  }
 }
 
 class Generate extends BaseActor {
@@ -23,18 +22,12 @@ class Generate extends BaseActor {
 
   def generate(value: Int) = {
     val id = CorrelationId.generate
-    output ! Send(id, Message.create("value" -> value))
-    become(processing(id, value))
+    output !! Send(id, Message.create("value" -> value))
+    become(sending(id, value))
   }
 
-  def processing(id: CorrelationId, value: Int, stopping: Boolean = false): Receive = {
-    case Acknowledge(`id`) =>
-      if (stopping) stop() else generate(value + 1)
-    case Failed(`id`, e) =>
-      log.error(e, "Send failed.")
-      if (stopping) stop() else generate(value + 1)
-    case Stop =>
-      become(processing(id, value, stopping = true))
+  def sending(id: CorrelationId, value: Int): Receive = {
+    case Accepted(`id`) => generate(value + 1)
   }
 }
 

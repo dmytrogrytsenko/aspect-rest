@@ -5,6 +5,7 @@ import java.util.UUID
 
 import akka.actor._
 import akka.cluster.{Cluster, MemberStatus}
+import akka.event.LoggingAdapter
 import akka.pattern.ask
 import akka.util.Timeout
 import aspect.common.Messages.Start
@@ -131,8 +132,35 @@ package object common {
       context.actorSelection(RootActorPath(address) / context.self.path.elements)
   }
 
-  implicit class RemoteActorRef(instance: ActorRef) {
+  implicit class RichActorRef(underlying: ActorRef) {
     def on(address: Address)(implicit context: ActorContext) =
-      context.actorSelection(RootActorPath(address) / instance.path.elements)
+      context.actorSelection(RootActorPath(address) / underlying.path.elements)
+    def !!(message: Any)(implicit sender: ActorRef = Actor.noSender, log: LoggingAdapter): Unit = {
+      log.debug(s"send to ${underlying.path.toStringWithoutAddress} message $message")
+      underlying.!(message)(sender)
+    }
+    def >>(message: Any)(implicit context: ActorContext, log: LoggingAdapter) = {
+      log.debug(s"forward to ${underlying.path.toStringWithoutAddress} message $message")
+      underlying.forward(message)
+    }
+    def ??(message: Any)(implicit timeout: Timeout, log: LoggingAdapter): Future[Any] = {
+      log.debug(s"ask ${underlying.path.toStringWithoutAddress} for $message")
+      underlying.?(message)(timeout)
+    }
+  }
+
+  implicit class RichActorSelection(val underlying: ActorSelection) {
+    def !!(message: Any)(implicit sender: ActorRef = Actor.noSender, log: LoggingAdapter) = {
+      log.debug(s"send to ${underlying.pathString} message $message")
+      underlying.!(message)(sender)
+    }
+    def >>(message: Any)(implicit context: ActorContext, log: LoggingAdapter) = {
+      log.debug(s"forward to ${underlying.pathString} message $message")
+      underlying.forward(message)
+    }
+    def ??(message: Any)(implicit timeout: Timeout, log: LoggingAdapter): Future[Any] = {
+      log.debug(s"ask ${underlying.pathString} for $message")
+      underlying.?(message)(timeout)
+    }
   }
 }
