@@ -1,6 +1,7 @@
 package aspect.rest
 
 import akka.io.IO
+import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.{BaseActor, NodeSingleton}
 import spray.can.Http
@@ -14,6 +15,6 @@ class RestGuardian extends BaseActor {
   def receive = {
     case Start =>
       val rest = RestService.create
-      IO(Http)(context.system) ! Http.Bind(rest, settings.interface, settings.port)
+      IO(Http)(context.system) !! Http.Bind(rest, settings.interface, settings.port)
   }
 }

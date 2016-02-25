@@ -5,8 +5,6 @@ import aspect.common.actors.{BaseActor, NodeSingleton}
 import aspect.routes._
 import spray.routing._
 
-import scala.concurrent.duration._
-
 object RestService extends NodeSingleton[RestService]
 
 class RestService extends BaseActor with HttpService with Jasonify
@@ -18,7 +16,7 @@ class RestService extends BaseActor with HttpService with Jasonify
 
   val settings = RestSettings(context.system)
 
-  implicit val timeout: Timeout = Timeout(5.seconds)
+  implicit val timeout: Timeout = Timeout(settings.defaultTimeout)
 
   val route = userRoutes ~ projectRoutes ~ webRoutes ~ targetRoutes ~ feedRoutes
 
