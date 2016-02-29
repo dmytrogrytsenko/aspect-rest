@@ -1,6 +1,5 @@
 package aspect.mongo
 
-import aspect.common.Shard
 import aspect.common.mongo.MongoCollection
 import aspect.domain.{TwitterAccountId, TwitterAccount}
 import reactivemongo.api.DB
@@ -24,7 +23,6 @@ object TwitterAccountCollection extends MongoCollection[TwitterAccountId, Twitte
   implicit object TwitterAccountReader extends BSONDocumentReader[TwitterAccount] {
     def read(doc: BSONDocument) = TwitterAccount(
       id = doc.getAs[TwitterAccountId]("_id").get,
-      shard = doc.getAs[Shard]("shard").get,
       email = doc.getAs[String]("email").get,
       emailPassword = doc.getAs[String]("emailPassword").get,
       twitterUserId = doc.getAs[String]("twitterUserId").get,
@@ -39,7 +37,6 @@ object TwitterAccountCollection extends MongoCollection[TwitterAccountId, Twitte
   implicit object TwitterAccountWriter extends BSONDocumentWriter[TwitterAccount] {
     def write(value: TwitterAccount) = $doc(
       "_id" -> value.id,
-      "shard" -> value.shard,
       "email" -> value.email,
       "emailPassword" -> value.emailPassword,
       "twitterUserId" -> value.twitterUserId,
@@ -53,7 +50,6 @@ object TwitterAccountCollection extends MongoCollection[TwitterAccountId, Twitte
 
   override def ensureIndexes(implicit db: DB, ec: ExecutionContext) =
     Future.sequence(List(
-      Index(Seq("shard" -> IndexType.Ascending)),
       Index(Seq("email" -> IndexType.Ascending), unique = true),
       Index(Seq("twitterUserId" -> IndexType.Ascending), unique = true),
       Index(Seq("twitterScreenName" -> IndexType.Ascending), unique = true)
