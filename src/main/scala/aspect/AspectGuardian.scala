@@ -17,7 +17,6 @@ class AspectGuardian extends BaseActor {
       ProjectRepository.create
       TargetRepository.create
       KeywordRepository.create
-      //Main("main")
 
       //if (cluster.selfRoles.contains("worker")) {
       //  KeywordsPreparer.create(Some("worker"))

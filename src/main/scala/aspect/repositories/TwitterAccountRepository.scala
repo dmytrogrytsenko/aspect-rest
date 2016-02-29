@@ -8,8 +8,8 @@ import aspect.domain.TwitterAccount
 import aspect.mongo.TwitterAccountCollection
 import reactivemongo.api.DB
 
-case class GetTwitterAccounts(shards: Set[Shard])
-case class TwitterAccounts(shards: Set[Shard], accounts: List[TwitterAccount])
+case object GetTwitterAccounts
+case class TwitterAccounts(accounts: List[TwitterAccount])
 
 object TwitterAccountRepository extends NodeSingleton[TwitterAccountRepository]
 
@@ -22,8 +22,6 @@ class TwitterAccountRepository extends BaseActor {
 
   def receive = {
     case Start => ensureIndexes
-
-    case GetTwitterAccounts(shards) =>
-      get(shards) map (TwitterAccounts(shards, _)) pipeTo sender()
+    case GetTwitterAccounts => all.map(TwitterAccounts).pipeTo(sender())
   }
 }
