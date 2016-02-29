@@ -1,19 +1,29 @@
 package aspect.experimental.flowing
 
-import akka.actor.{Props, ActorContext}
+import akka.actor.{ActorRef, Props, ActorContext}
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.experimental.flowing.Messages._
+import aspect.common.flowing._
+import aspect.common.flowing.Messages._
+
+case class Print(name: String, underlying: ActorRef, input: Input[Int])
+  extends Reactor with DefaultInput[Int]
 
 object Print {
-  def apply(name: String = "")(implicit context: ActorContext) =
-    new Reactor(Props[Print], name) with DefaultInput[Int] {
-      val input = Input.default[Int]
+  def create(implicit context: ActorContext) = {
+    val name = this.getClass.getSimpleName
+    val underlying = PrintReactor.props.create(name)
+    val input = Input.default[Int](name)
+    Print(name, underlying, input)
   }
 }
 
-class Print extends BaseActor {
+object PrintReactor {
+  def props = Props[PrintReactor]
+}
+
+class PrintReactor extends BaseActor {
   val input = Endpoint.createDefaultInput
 
   def receive = {

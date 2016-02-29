@@ -1,4 +1,4 @@
-package aspect.experimental.flowing
+package aspect.common.flowing
 
 import aspect.common._
 import org.joda.time.DateTime

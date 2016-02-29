@@ -1,21 +1,27 @@
 package aspect.experimental.flowing
 
-import akka.actor.{ActorContext, Props}
+import akka.actor.{ActorRef, ActorContext, Props}
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.experimental.flowing.Messages._
+import aspect.common.flowing.Messages._
+import aspect.common.flowing._
+
+case class Multiply(name: String, underlying: ActorRef, input1: Input[Int], input2: Input[Int], output: Output[Int])
+  extends Reactor with DefaultOutput[Int]
 
 object Multiply {
-  def apply(name: String = "")(implicit context: ActorContext) =
-    new Reactor(Props[Multiply], name) with DefaultOutput[Int] {
-      val input1 = Input[Int]("input1")
-      val input2 = Input[Int]("input2")
-      val output = Output.default[Int]
-    }
+  def create(implicit context: ActorContext) = {
+    val name = this.getClass.getSimpleName
+    val underlying = Props[MultiplyReactor].create(name)
+    val input1 = Input[Int](name, "input1")
+    val input2 = Input[Int](name, "input2")
+    val output = Output.default[Int](name)
+    Multiply(name, underlying, input1, input2, output)
+  }
 }
 
-class Multiply extends BaseActor {
+class MultiplyReactor extends BaseActor {
   val input1 = Endpoint.createInput("input1")
   val input2 = Endpoint.createInput("input2")
   val output = Endpoint.createDefaultOutput

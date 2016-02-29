@@ -1,10 +1,10 @@
-package aspect.experimental.flowing
+package aspect.common.flowing
 
-import akka.actor.{ActorContext, Actor}
+import akka.actor.{Actor, ActorContext}
 import aspect.common._
 import aspect.common.actors.BaseActor
 
-trait FlowActor extends BaseActor {
+trait FlowReactor extends BaseActor {
   def receive = Actor.emptyBehavior
 
   implicit class RichOutput[T](source: Output[T]) {

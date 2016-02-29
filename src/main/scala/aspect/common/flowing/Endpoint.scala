@@ -1,10 +1,10 @@
-package aspect.experimental.flowing
+package aspect.common.flowing
 
-import akka.actor.{ActorRef, ActorContext, Props}
-import aspect.common._
+import akka.actor.{ActorContext, ActorRef, Props}
 import aspect.common.Messages.Start
+import aspect.common._
 import aspect.common.actors.BaseActor
-import aspect.experimental.flowing.Messages._
+import aspect.common.flowing.Messages._
 
 import scala.collection.mutable
 

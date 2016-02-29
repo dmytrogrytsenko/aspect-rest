@@ -1,10 +1,10 @@
-package aspect.experimental.flowing
+package aspect.common.flowing
 
-import akka.actor.{Props, ActorSelection}
-import aspect.common._
+import akka.actor.{ActorSelection, Props}
 import aspect.common.Messages.Start
+import aspect.common._
 import aspect.common.actors.BaseActor
-import aspect.experimental.flowing.Messages._
+import aspect.common.flowing.Messages._
 
 object Link {
   def props(source: ActorSelection, destination: ActorSelection): Props =

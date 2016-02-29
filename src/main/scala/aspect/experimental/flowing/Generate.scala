@@ -1,19 +1,25 @@
 package aspect.experimental.flowing
 
-import akka.actor.{Props, ActorContext}
+import akka.actor.{ActorRef, Props, ActorContext}
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.experimental.flowing.Messages.{Accepted, Message, Send, CorrelationId}
+import aspect.common.flowing.Messages._
+import aspect.common.flowing.{Reactor, Endpoint, Output, DefaultOutput}
+
+case class Generate(name: String, underlying: ActorRef, output: Output[Int])
+  extends Reactor with DefaultOutput[Int]
 
 object Generate {
-  def apply(name: String = "")(implicit context: ActorContext) =
-    new Reactor(Props[Generate], name) with DefaultOutput[Int] {
-      val output = Output.default[Int]
-    }
+  def create(implicit context: ActorContext): Generate = {
+    val name = this.getClass.getSimpleName
+    val underlying = Props[GenerateReactor].create(name)
+    val output = Output.default[Int](name)
+    Generate(name, underlying, output)
+  }
 }
 
-class Generate extends BaseActor {
+class GenerateReactor extends BaseActor {
   val output = Endpoint.createDefaultOutput
 
   def receive = {

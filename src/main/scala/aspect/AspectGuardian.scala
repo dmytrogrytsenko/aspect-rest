@@ -3,7 +3,7 @@ package aspect
 import aspect.common.Messages.Start
 import aspect.common.actors.{BaseActor, HandlerGuardian}
 import aspect.experimental.TwitterSearcher
-import aspect.experimental.flowing.Main
+import aspect.experimental.flowing.MainFlow
 import aspect.repositories._
 import aspect.rest.RestGuardian
 
@@ -17,6 +17,8 @@ class AspectGuardian extends BaseActor {
       ProjectRepository.create
       TargetRepository.create
       KeywordRepository.create
+
+      MainFlow.create
 
       //if (cluster.selfRoles.contains("worker")) {
       //  KeywordsPreparer.create(Some("worker"))
