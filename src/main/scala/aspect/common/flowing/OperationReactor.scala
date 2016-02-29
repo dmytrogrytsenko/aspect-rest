@@ -6,6 +6,8 @@ import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
 import aspect.common.flowing.Messages._
 
+import scala.concurrent.duration._
+
 case class Operation[I, O](name: String, underlying: ActorRef, input: Input[I], output: Output[O])
   extends Reactor with DefaultInput[I] with DefaultOutput[O]
 
@@ -33,6 +35,7 @@ class OperationReactor(factory: Message => Props) extends BaseActor {
   }
 
   def request() = {
+    context.setReceiveTimeout(Duration.Inf)
     val reqId = CorrelationId.generate
     input !! Request(reqId)
     become(requesting(reqId))
@@ -42,7 +45,10 @@ class OperationReactor(factory: Message => Props) extends BaseActor {
     case Handle(`reqId`, msg) =>
       input !! Acknowledge(reqId)
       val operation = watch(factory(msg).create)
+      context.setReceiveTimeout(5.seconds)
       become(handling(reqId, operation))
+    case Terminated(actor) =>
+      log.warning("Expired handling termination.")
   }
 
   def handling(reqId: CorrelationId, operation: ActorRef): Receive = {
@@ -51,14 +57,20 @@ class OperationReactor(factory: Message => Props) extends BaseActor {
       output !! Send(sndId, result)
       become(sending(sndId))
     case Status.Failure(e) =>
-      ???
+      log.error(e, "Handling failed.")
+      request()
+    case Terminated(actor) if actor == operation =>
+      log.error("Handling terminated.")
+      request()
     case Terminated(actor) =>
-      ???
+      log.warning("Expired handling termination.")
     case ReceiveTimeout =>
-      ???
+      log.error("Handling timed out.")
+      request()
   }
 
   def sending(sndId: CorrelationId): Receive = {
     case Accepted(`sndId`) => request()
+    case Terminated(actor) => log.warning("Expired handling termination.")
   }
 }
