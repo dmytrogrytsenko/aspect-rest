@@ -1,9 +1,9 @@
 package aspect.rest.user
 
-import aspect.TestBase
 import aspect.common._
 import aspect.controllers.user.ProfileResult
 import aspect.rest.Errors.Unauthorized
+import aspect.TestBase
 
 class RestGetProfileTest extends TestBase {
 

@@ -1,10 +1,10 @@
 package aspect.rest.project
 
-import aspect.TestBase
 import aspect.common._
 import aspect.controllers.project.{AddProjectData, AddProjectResult}
 import aspect.domain.{UserId, Project}
 import aspect.rest.Errors.{BadRequest, Unauthorized}
+import aspect.TestBase
 
 class RestAddProjectTest extends TestBase {
 

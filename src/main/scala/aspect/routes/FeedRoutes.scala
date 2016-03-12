@@ -4,8 +4,7 @@ import aspect.common._
 import aspect.controllers.feed.{PostAuthorResult, PostResult, FeedResult, GetFeedController}
 import aspect.domain.{PostId, AccountId}
 import aspect.rest.{JsonProtocol, Routes}
-import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
-import spray.json.{JsonFormat, JsValue, JsString, DeserializationException}
+import spray.json._
 
 trait FeedRoutesJson extends JsonProtocol {
   implicit object AccountIdJsonFormat extends JsonFormat[AccountId] {

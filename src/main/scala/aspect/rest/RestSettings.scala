@@ -7,11 +7,15 @@ import com.typesafe.config.Config
 
 import scala.concurrent.duration._
 
+case class EndpointSettings(config: Config) {
+  val interface = config.getString("interface")
+  val port = config.getInt("port")
+  val defaultTimeout = config.getDuration("defaultTimeout", TimeUnit.MILLISECONDS).milliseconds
+}
+
 class RestSettingsImpl(config: Config) extends Extension {
   private[this] val restSettings = config.getConfig("aspect.rest")
-  val interface = restSettings.getString("interface")
-  val port = restSettings.getInt("port")
-  val defaultTimeout = restSettings.getDuration("defaultTimeout", TimeUnit.MILLISECONDS).milliseconds
+  val endpoint = EndpointSettings(restSettings)
 }
 
 object RestSettings extends ExtensionId[RestSettingsImpl] with ExtensionIdProvider {

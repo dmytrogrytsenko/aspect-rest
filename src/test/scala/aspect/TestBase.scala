@@ -1,5 +1,7 @@
 package aspect
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import aspect.common._
 import org.joda.time.DateTime
@@ -8,6 +10,10 @@ import org.scalatest.{FlatSpecLike, Matchers}
 import scala.concurrent.duration._
 
 trait TestBase extends FlatSpecLike with Matchers with MongoSupport with RestSupport {
+  implicit val system = ActorSystem()
+
+  implicit val materializer = ActorMaterializer()
+
   implicit val timeout: Timeout = Timeout(5.seconds)
 
   implicit class DateTimeRangeBuilder(instance: DateTime) {
