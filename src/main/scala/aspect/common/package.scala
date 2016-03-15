@@ -102,12 +102,6 @@ package object common {
       actor ! Start
       actor
     }
-
-    def execute[T](implicit tag: ClassTag[T],
-                   context: ActorContext,
-                   executionContext: ExecutionContext,
-                   timeout: Timeout): Future[T] =
-      (context.actorOf(props) ? Start flatMap normalizeAskResult).mapTo[T]
   }
 
   implicit class RichCluster(cluster: Cluster) {

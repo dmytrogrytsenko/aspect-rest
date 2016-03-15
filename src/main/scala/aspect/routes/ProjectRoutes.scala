@@ -1,24 +1,20 @@
 package aspect.routes
 
+import akka.http.scaladsl.server.PathMatcher1
+import akka.http.scaladsl.server.PathMatchers._
+import akka.http.scaladsl.unmarshalling.Unmarshaller
 import aspect.common._
 import aspect.common.Messages.Done
 import aspect.controllers.project._
 import aspect.domain.ProjectId
 import aspect.rest.Errors.BadRequest
 import aspect.rest.{JsonProtocol, Routes}
-import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
-import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
-import spray.httpx.unmarshalling.{DeserializationError, FromStringDeserializer}
-import spray.json.{JsonFormat, JsValue, JsString, DeserializationException}
-import spray.routing.PathMatcher1
-import spray.routing.PathMatchers.Segment
+import spray.json._
 
 trait ProjectRoutesJson extends JsonProtocol with UserRoutesJson {
   val ProjectIdSegment: PathMatcher1[ProjectId] = Segment.map(ProjectId.apply)
 
-  implicit val ProjectIdDeserializer = new FromStringDeserializer[ProjectId] {
-    def apply(value: String): Either[DeserializationError, ProjectId] = Right(ProjectId(value))
-  }
+  implicit val ProjectIdUnmarshaller = Unmarshaller.strict[String, ProjectId](ProjectId(_))
 
   implicit object ProjectIdJsonFormat extends JsonFormat[ProjectId] {
     def read(json: JsValue): ProjectId = json match {

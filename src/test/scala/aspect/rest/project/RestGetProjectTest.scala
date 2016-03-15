@@ -1,10 +1,10 @@
 package aspect.rest.project
 
-import aspect.TestBase
 import aspect.common._
 import aspect.controllers.project.{ProjectResult, ProjectUserResult}
 import aspect.domain.{ProjectId, UserId}
 import aspect.rest.Errors.{Forbidden, NotFound, Unauthorized}
+import aspect.TestBase
 
 class RestGetProjectTest extends TestBase {
 

@@ -6,20 +6,9 @@ import aspect.controllers.user._
 import aspect.domain.UserId
 import aspect.rest.Errors.BadRequest
 import aspect.rest.{JsonProtocol, Routes}
-import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
-import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
-import spray.httpx.unmarshalling.{DeserializationError, FromStringDeserializer}
 import spray.json._
-import spray.routing.PathMatcher1
-import spray.routing.PathMatchers.Segment
 
 trait UserRoutesJson extends JsonProtocol {
-  val UserIdSegment: PathMatcher1[UserId] = Segment.map(UserId.apply)
-
-  implicit val UserIdDeserializer = new FromStringDeserializer[UserId] {
-    def apply(value: String): Either[DeserializationError, UserId] = Right(UserId(value))
-  }
-
   implicit object UserIdJsonFormat extends JsonFormat[UserId] {
     def read(json: JsValue): UserId = json match {
       case JsString(value) => UserId(value)
@@ -63,7 +52,7 @@ trait UserRoutes extends Routes with UserRoutesJson {
       }
     }
 
-  val profileRoute =
+  val profileRoute = mapRequest(r => { println(r); r }) {
     path("profile") {
       get {
         authenticate(userAuthenticator) { userId =>
@@ -73,6 +62,7 @@ trait UserRoutes extends Routes with UserRoutesJson {
         }
       }
     }
+  }
 
   val userRoutes = loginRoute ~ logoutRoute ~ profileRoute
 }

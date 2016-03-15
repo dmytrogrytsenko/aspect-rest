@@ -1,9 +1,9 @@
 package aspect.rest
 
+import akka.http.scaladsl.model.StatusCode
 import aspect.rest.Errors.ErrorResult
 import org.joda.time.{DateTimeZone, DateTime}
 import org.joda.time.format.ISODateTimeFormat
-import spray.http.StatusCode
 import spray.json._
 
 trait JsonProtocol extends DefaultJsonProtocol {
@@ -20,7 +20,7 @@ trait JsonProtocol extends DefaultJsonProtocol {
   }
 
   implicit object StatusCodeJsonFormat extends RootJsonFormat[StatusCode] {
-    def write(statusCode: StatusCode): JsValue = JsNumber(statusCode.intValue)
+    def write(statusCode: StatusCode): JsValue = JsNumber(statusCode.intValue())
 
     def read(json: JsValue): StatusCode = json match {
       case JsNumber(x) => StatusCode.int2StatusCode(x.toInt)

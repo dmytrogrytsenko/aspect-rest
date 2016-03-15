@@ -1,9 +1,9 @@
 package aspect.rest.project
 
-import aspect.TestBase
 import aspect.common._
 import aspect.controllers.project.{ProjectItemResult, ProjectListResult}
 import aspect.rest.Errors.Unauthorized
+import aspect.TestBase
 
 class RestGetProjectsTest extends TestBase {
 

@@ -2,9 +2,9 @@ package aspect.rest.target
 
 import aspect.controllers.target.{AddTargetResult, AddTargetData}
 import aspect.common._
-import aspect.TestBase
 import aspect.domain.{ProjectId, Target}
 import aspect.rest.Errors.{BadRequest, NotFound, Forbidden, Unauthorized}
+import aspect.TestBase
 
 class RestAddTargetTest extends TestBase {
 

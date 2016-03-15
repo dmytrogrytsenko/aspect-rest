@@ -1,10 +1,10 @@
 package aspect.rest.target
 
-import aspect.TestBase
 import aspect.controllers.target.{TargetItemResult, TargetListResult}
 import aspect.common._
 import aspect.domain.ProjectId
 import aspect.rest.Errors.{NotFound, Forbidden, Unauthorized}
+import aspect.TestBase
 
 class RestGetTargetsTest extends TestBase {
 

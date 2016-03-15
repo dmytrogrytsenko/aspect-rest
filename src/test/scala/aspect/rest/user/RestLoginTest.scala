@@ -1,9 +1,9 @@
 package aspect.rest.user
 
-import aspect.TestBase
 import aspect.common._
 import aspect.controllers.user.{LoginData, LoginResult}
 import aspect.rest.Errors.{BadRequest, Unauthorized}
+import aspect.TestBase
 import org.joda.time.DateTime
 
 class RestLoginTest extends TestBase {
