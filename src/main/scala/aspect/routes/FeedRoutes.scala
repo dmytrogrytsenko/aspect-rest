@@ -3,12 +3,11 @@ package aspect.routes
 import aspect.common._
 import aspect.controllers.feed.{PostAuthorResult, PostResult, FeedResult, GetFeedController}
 import aspect.domain.{PostId, AccountId}
-import aspect.rest.JsonProtocol._
-import aspect.rest.Routes
+import aspect.rest.{JsonProtocol, Routes}
 import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 import spray.json.{JsonFormat, JsValue, JsString, DeserializationException}
 
-object FeedRoutesJson {
+trait FeedRoutesJson extends JsonProtocol {
   implicit object AccountIdJsonFormat extends JsonFormat[AccountId] {
     def read(json: JsValue): AccountId = json match {
       case JsString(value) => AccountId(value)
@@ -30,9 +29,8 @@ object FeedRoutesJson {
   implicit val jsonFeedResult = jsonFormat1(FeedResult.apply)
 }
 
-trait FeedRoutes extends Routes {
+trait FeedRoutes extends Routes with FeedRoutesJson {
 
-  import FeedRoutesJson._
   import context.dispatcher
 
   val getFeedRoute =

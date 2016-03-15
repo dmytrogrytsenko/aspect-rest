@@ -5,10 +5,7 @@ import aspect.controllers.target.{UpdateTargetData, AddTargetData}
 import aspect.controllers.user.LoginData
 import aspect.domain.{TargetId, ProjectId}
 import aspect.rest.Errors.{RestException, ErrorResult}
-import aspect.rest.JsonProtocol._
-import aspect.routes.UserRoutesJson._
-import aspect.routes.ProjectRoutesJson._
-import aspect.routes.TargetRoutesJson._
+import aspect.routes.{UserRoutesJson, ProjectRoutesJson, TargetRoutesJson}
 import com.ning.http.client.Response
 import dispatch.{Http, Req, url}
 import org.scalatest.Matchers
@@ -21,7 +18,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait RestSupport extends Matchers {
+trait RestSupport extends Matchers with UserRoutesJson with ProjectRoutesJson with TargetRoutesJson {
 
   val baseUrl = url("http://localhost:8888")
 

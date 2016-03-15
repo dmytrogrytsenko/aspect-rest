@@ -9,4 +9,5 @@
     <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
     </root>
+    <logger name="com.ning.http.client" level="WARN"/>
 </configuration>

@@ -47,7 +47,6 @@ class SessionRepository extends BaseActor {
 
     case Activity(token) =>
       activity(token) map { _ =>
-        log.debug("ACTIVITY COMPLETED")
         ActivityCompleted(token)
       } pipeTo sender()
   }

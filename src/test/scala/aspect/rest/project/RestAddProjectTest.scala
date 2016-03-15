@@ -5,7 +5,6 @@ import aspect.common._
 import aspect.controllers.project.{AddProjectData, AddProjectResult}
 import aspect.domain.{UserId, Project}
 import aspect.rest.Errors.{BadRequest, Unauthorized}
-import aspect.routes.ProjectRoutesJson._
 
 class RestAddProjectTest extends TestBase {
 

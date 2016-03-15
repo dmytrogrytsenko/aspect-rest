@@ -6,7 +6,7 @@ import org.joda.time.format.ISODateTimeFormat
 import spray.http.StatusCode
 import spray.json._
 
-object JsonProtocol extends DefaultJsonProtocol {
+trait JsonProtocol extends DefaultJsonProtocol {
 
   implicit object DateTimeJsonFormat extends RootJsonFormat[DateTime] {
     private lazy val format = ISODateTimeFormat.dateTimeNoMillis()

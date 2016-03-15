@@ -5,8 +5,7 @@ import aspect.common.Messages.Done
 import aspect.controllers.project._
 import aspect.domain.ProjectId
 import aspect.rest.Errors.BadRequest
-import aspect.rest.JsonProtocol._
-import aspect.rest.Routes
+import aspect.rest.{JsonProtocol, Routes}
 import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
 import spray.httpx.unmarshalling.{DeserializationError, FromStringDeserializer}
@@ -14,7 +13,7 @@ import spray.json.{JsonFormat, JsValue, JsString, DeserializationException}
 import spray.routing.PathMatcher1
 import spray.routing.PathMatchers.Segment
 
-object ProjectRoutesJson {
+trait ProjectRoutesJson extends JsonProtocol with UserRoutesJson {
   val ProjectIdSegment: PathMatcher1[ProjectId] = Segment.map(ProjectId.apply)
 
   implicit val ProjectIdDeserializer = new FromStringDeserializer[ProjectId] {
@@ -29,8 +28,6 @@ object ProjectRoutesJson {
     def write(value: ProjectId): JsValue = JsString(value.underlying)
   }
 
-  import UserRoutesJson._
-
   implicit val jsonProjectItemResult = jsonFormat2(ProjectItemResult.apply)
   implicit val jsonProjectListResult = jsonFormat1(ProjectListResult)
   implicit val jsonProjectResult = jsonFormat2(ProjectUserResult.apply)
@@ -40,15 +37,14 @@ object ProjectRoutesJson {
   implicit val jsonUpdateProjectData = jsonFormat1(UpdateProjectData.apply)
 }
 
-trait ProjectRoutes extends Routes {
+trait ProjectRoutes extends Routes with ProjectRoutesJson {
 
-  import ProjectRoutesJson._
   import context.dispatcher
 
   val getProjectsRoute =
     path("projects") {
       get {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           complete {
             GetProjectsController.props(userId).execute[ProjectListResult]
           }
@@ -59,7 +55,7 @@ trait ProjectRoutes extends Routes {
   val getProjectRoute =
     path("projects" / ProjectIdSegment) { projectId =>
       get {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           complete {
             GetProjectController.props(userId, projectId).execute[ProjectResult]
           }
@@ -70,7 +66,7 @@ trait ProjectRoutes extends Routes {
   val addProjectRoute =
     path("projects") {
       post {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           entity(as[AddProjectData]) { data =>
             validate(data.name.nonEmpty, BadRequest.Validation.requiredMemberEmpty("name").message) {
               complete {
@@ -85,7 +81,7 @@ trait ProjectRoutes extends Routes {
   val removeProjectRoute =
     path("projects" / ProjectIdSegment) { projectId =>
       delete {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           complete {
             RemoveProjectController.props(userId, projectId).execute[Done].map(_ => "")
           }
@@ -96,7 +92,7 @@ trait ProjectRoutes extends Routes {
   val updateProjectRoute =
     path("projects" / ProjectIdSegment) { projectId =>
       put {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           entity(as[UpdateProjectData]) { data =>
             validate(data.name.map(_.nonEmpty).getOrElse(true), BadRequest.Validation.requiredMemberEmpty("name").message) {
               complete {

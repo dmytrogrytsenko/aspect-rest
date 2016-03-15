@@ -3,7 +3,6 @@ package aspect.gateways.twitter.client
 import com.ning.http.client.Response
 import dispatch.{url, Http}
 import org.jboss.netty.handler.codec.http.HttpResponseStatus._
-import org.joda.time.DateTime
 import spray.json._
 
 import scala.concurrent.{ExecutionContext, Future}

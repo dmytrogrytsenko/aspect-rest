@@ -4,7 +4,6 @@ import aspect.TestBase
 import aspect.common._
 import aspect.controllers.user.ProfileResult
 import aspect.rest.Errors.Unauthorized
-import aspect.routes.UserRoutesJson._
 
 class RestGetProfileTest extends TestBase {
 

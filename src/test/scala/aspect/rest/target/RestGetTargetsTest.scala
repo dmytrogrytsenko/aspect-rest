@@ -5,7 +5,6 @@ import aspect.controllers.target.{TargetItemResult, TargetListResult}
 import aspect.common._
 import aspect.domain.ProjectId
 import aspect.rest.Errors.{NotFound, Forbidden, Unauthorized}
-import aspect.routes.TargetRoutesJson._
 
 class RestGetTargetsTest extends TestBase {
 

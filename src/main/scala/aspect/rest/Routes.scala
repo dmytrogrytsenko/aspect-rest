@@ -29,7 +29,7 @@ trait Routes extends BaseActor with HttpService {
       case SessionNotFound(`token`) => Future { None }
     }
 
-  def userAuthentificator: ContextAuthenticator[UserId] = ctx =>
+  def userAuthenticator: ContextAuthenticator[UserId] = ctx =>
     Future {
       ctx.request.headers.find(_.name == "Authorization").map(_.value)
     } flatMap {
@@ -42,7 +42,7 @@ trait Routes extends BaseActor with HttpService {
       case None => Future.successful(Left(credentialsMissing))
     }
 
-  def tokenAuthentificator: ContextAuthenticator[String] = ctx =>
+  def tokenAuthenticator: ContextAuthenticator[String] = ctx =>
     Future {
       ctx.request.headers
         .find(_.name == "Authorization")

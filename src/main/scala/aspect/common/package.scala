@@ -9,7 +9,6 @@ import akka.event.LoggingAdapter
 import akka.pattern.ask
 import akka.util.Timeout
 import aspect.common.Messages.Start
-import aspect.common.actors.HandlerGuardian
 import org.joda.time.DateTime
 
 import scala.concurrent.duration.FiniteDuration
@@ -92,7 +91,6 @@ package object common {
   }
 
   implicit class RichProps(props: Props) {
-
     def create(implicit context: ActorContext) = {
       val actor = context.actorOf(props)
       actor ! Start
@@ -105,15 +103,11 @@ package object common {
       actor
     }
 
-    def start(implicit context: ActorContext): Unit = HandlerGuardian.endpoint ! props
-
-    def delegate(implicit context: ActorContext): Unit = HandlerGuardian.endpoint forward props
-
     def execute[T](implicit tag: ClassTag[T],
                    context: ActorContext,
                    executionContext: ExecutionContext,
                    timeout: Timeout): Future[T] =
-      (HandlerGuardian.endpoint ? props flatMap normalizeAskResult).mapTo[T]
+      (context.actorOf(props) ? Start flatMap normalizeAskResult).mapTo[T]
   }
 
   implicit class RichCluster(cluster: Cluster) {

@@ -3,7 +3,6 @@ package aspect.rest
 import akka.pattern.AskTimeoutException
 import aspect.common._
 import aspect.rest.Errors._
-import aspect.rest.JsonProtocol._
 import spray.http.HttpHeaders.{`Content-Range`, Allow}
 import spray.json._
 import spray.http._
@@ -16,7 +15,7 @@ import spray.util.LoggingContext
 
 import scala.util.matching.Regex
 
-trait Jasonify extends BasicDirectives {
+trait Jasonify extends BasicDirectives with JsonProtocol {
 /*
   val wordPattern = "[A-Z][^A-Z]*".r
   val rejectionSuffixPattern = "Rejection$".r

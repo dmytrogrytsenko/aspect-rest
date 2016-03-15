@@ -5,7 +5,6 @@ import aspect.common._
 import aspect.TestBase
 import aspect.domain.{ProjectId, Target}
 import aspect.rest.Errors.{BadRequest, NotFound, Forbidden, Unauthorized}
-import aspect.routes.TargetRoutesJson._
 
 class RestAddTargetTest extends TestBase {
 

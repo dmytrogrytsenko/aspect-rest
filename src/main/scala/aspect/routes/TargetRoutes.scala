@@ -5,8 +5,7 @@ import aspect.common.Messages.Done
 import aspect.controllers.target._
 import aspect.domain.{ProjectId, TargetId}
 import aspect.rest.Errors.BadRequest
-import aspect.rest.JsonProtocol._
-import aspect.rest.Routes
+import aspect.rest.{JsonProtocol, Routes}
 import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 import spray.httpx.SprayJsonSupport.sprayJsonUnmarshaller
 import spray.httpx.unmarshalling.{DeserializationError, FromStringDeserializer}
@@ -14,7 +13,7 @@ import spray.json.{JsonFormat, DeserializationException, JsString, JsValue}
 import spray.routing.PathMatchers.Segment
 import spray.routing.PathMatcher1
 
-object TargetRoutesJson {
+trait TargetRoutesJson extends JsonProtocol with UserRoutesJson with ProjectRoutesJson {
   val TargetIdSegment: PathMatcher1[TargetId] = Segment.map(TargetId.apply)
 
   implicit val TargetIdDeserializer = new FromStringDeserializer[TargetId] {
@@ -29,9 +28,6 @@ object TargetRoutesJson {
     def write(value: TargetId): JsValue = JsString(value.underlying)
   }
 
-  import UserRoutesJson._
-  import ProjectRoutesJson._
-
   implicit val jsonTargetItemResult = jsonFormat3(TargetItemResult.apply)
   implicit val jsonTargetListResult = jsonFormat1(TargetListResult)
   implicit val jsonTargetUserResult = jsonFormat2(TargetUserResult)
@@ -42,16 +38,14 @@ object TargetRoutesJson {
   implicit val jsonUpdateTargetData = jsonFormat2(UpdateTargetData)
 }
 
-trait TargetRoutes extends Routes {
+trait TargetRoutes extends Routes with TargetRoutesJson {
 
-  import ProjectRoutesJson._
-  import TargetRoutesJson._
   import context.dispatcher
 
   val getTargetsRoute =
     path("targets") {
       get {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           parameters("projectId".as[ProjectId]) { projectId =>
             complete {
               GetTargetsController.props(userId, projectId).execute[TargetListResult]
@@ -64,7 +58,7 @@ trait TargetRoutes extends Routes {
   val getTargetRoute =
     path("targets" / TargetIdSegment) { targetId =>
       get {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           complete {
             GetTargetController.props(userId, targetId).execute[TargetResult]
           }
@@ -75,7 +69,7 @@ trait TargetRoutes extends Routes {
   val addTargetRoute =
     path("targets") {
       post {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           entity(as[AddTargetData]) { data =>
             validate(data.name.nonEmpty, BadRequest.Validation.requiredMemberEmpty("name").message) {
               complete {
@@ -90,7 +84,7 @@ trait TargetRoutes extends Routes {
   val removeTargetRoute =
     path("targets" / TargetIdSegment) { targetId =>
       delete {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           complete {
             RemoveTargetController.props(userId, targetId).execute[Done].map(_ => "")
           }
@@ -101,7 +95,7 @@ trait TargetRoutes extends Routes {
   val updateTargetRoute =
     path("targets" / TargetIdSegment) { targetId =>
       put {
-        authenticate(userAuthentificator) { userId =>
+        authenticate(userAuthenticator) { userId =>
           entity(as[UpdateTargetData]) { data =>
             validate(data.name.map(_.nonEmpty).getOrElse(true), BadRequest.Validation.requiredMemberEmpty("name").message) {
               complete {
