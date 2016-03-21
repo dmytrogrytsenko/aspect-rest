@@ -3,10 +3,10 @@ package aspect.common.mongo
 import aspect.common.Shard
 import reactivemongo.api.DB
 import reactivemongo.api.collections.default.BSONCollection
-import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson._
 import reactivemongo.extensions.dsl.BsonDsl
 
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, ExecutionContext}
 
 trait MongoCollection[TId, TEntity] extends BsonDsl {
@@ -14,6 +14,26 @@ trait MongoCollection[TId, TEntity] extends BsonDsl {
   def name: String
 
   def ensureIndexes(implicit db: DB, executionContext: ExecutionContext): Future[Unit] = Future { }
+
+  implicit object DurationReader extends BSONReader[BSONString, Duration] {
+    def read(bson: BSONString): Duration = Duration(bson.value)
+  }
+
+  implicit object DurationWriter extends BSONWriter[Duration, BSONString] {
+    def write(value: Duration) = BSONString(value.toString)
+  }
+
+  /* Source: https://github.com/hmrc/simple-reactivemongo/blob/master/src/main/scala/uk/gov/hmrc/mongo/ExtraBSONHandlers.scala */
+  implicit def MapBSONReader[T](implicit reader: BSONReader[_ <: BSONValue, T]): BSONDocumentReader[Map[String, T]] =
+    new BSONDocumentReader[Map[String, T]] {
+      def read(doc: BSONDocument): Map[String, T] = {
+        doc.elements.collect {
+          case (key, value) => value.seeAsOpt[T](reader) map {
+            ov => (key, ov)
+          }
+        }.flatten.toMap
+      }
+    }
 
   implicit object ShardReader extends BSONReader[BSONInteger, Shard] {
     def read(bson: BSONInteger): Shard = Shard(bson.value)

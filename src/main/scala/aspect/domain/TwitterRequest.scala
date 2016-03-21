@@ -1,39 +1,43 @@
-package aspect.experimental
+package aspect.domain
 
 import org.joda.time.DateTime
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.Duration
+
+case class TwitterRequestId(underlying: String) extends AnyVal
+
+case class TwitterExecutionId(underlying: String) extends AnyVal
 
 case class TrackInfo(version: Long, createTime: DateTime, lastUpdateTime: DateTime)
 
 case class TweetPoint(id: String, time: DateTime)
 case class TweetRange(min: TweetPoint, max: TweetPoint)
+
 case class LastError(count: Int, message: String)
 
-case class LastExecution(id: String,
+case class LastExecution(id: TwitterExecutionId,
                          startTime: DateTime,
                          finishTime: DateTime,
-                         duration: FiniteDuration,
+                         duration: Duration,
                          error: Option[LastError])
 
-case class CurrentExecution(id: String, startTime: DateTime)
+case class CurrentExecution(id: TwitterExecutionId, startTime: DateTime)
 
 case class ProcessingInfo(last: Option[LastExecution],
                           current: Option[CurrentExecution],
                           nextTime: DateTime,
-                          successInterval: FiniteDuration,
-                          errorInterval: FiniteDuration)
+                          successInterval: Duration,
+                          errorInterval: Duration)
 
-case class TwitterQuery(id: String,
-                        query: String,
-                        found: Option[TweetRange],
-                        pending: Option[TweetRange],
-                        forward: Option[ProcessingInfo],
-                        backward: Option[ProcessingInfo],
-                        backwardCompleted: Option[Boolean],
-                        disabled: Option[Boolean],
-                        track: TrackInfo)
-
+case class TwitterRequest(id: TwitterRequestId,
+                          query: String,
+                          found: Option[TweetRange],
+                          pending: Option[TweetRange],
+                          forward: Option[ProcessingInfo],
+                          backward: Option[ProcessingInfo],
+                          backwardCompleted: Option[Boolean],
+                          disabled: Option[Boolean],
+                          track: TrackInfo)
 /*
 {
   "_id": "<md5 of query>",
