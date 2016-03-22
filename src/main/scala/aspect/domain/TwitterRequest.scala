@@ -1,5 +1,6 @@
 package aspect.domain
 
+import aspect.common._
 import org.joda.time.DateTime
 
 import scala.concurrent.duration.Duration
@@ -27,7 +28,9 @@ case class ProcessingInfo(last: Option[LastExecution],
                           current: Option[CurrentExecution],
                           nextTime: DateTime,
                           successInterval: Duration,
-                          errorInterval: Duration)
+                          errorInterval: Duration) {
+  def executing = current.isDefined
+}
 
 case class TwitterRequest(id: TwitterRequestId,
                           query: String,
@@ -37,7 +40,17 @@ case class TwitterRequest(id: TwitterRequestId,
                           backward: Option[ProcessingInfo],
                           backwardCompleted: Option[Boolean],
                           disabled: Option[Boolean],
-                          track: TrackInfo)
+                          track: TrackInfo) {
+
+  def isInitial = forward.isEmpty
+  def isPending = pending.isEmpty
+  def isForwardExecuting = forward.exists(_.current.isEmpty)
+  def isBackwardExecuting = backward.exists(_.current.isEmpty)
+  def isBackwardCompleted = backwardCompleted.contains(true)
+  def isForwardNextTimeHasCome = forward.exists(_.nextTime <= DateTime.now)
+  def isBackwardNextTimeHasCome = backward.exists(_.nextTime <= DateTime.now)
+}
+
 /*
 {
   "_id": "<md5 of query>",

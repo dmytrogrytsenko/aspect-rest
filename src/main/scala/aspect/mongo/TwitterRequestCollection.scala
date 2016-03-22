@@ -153,4 +153,10 @@ object TwitterRequestCollection extends MongoCollection[TwitterRequestId, Twitte
       "disabled" -> value.disabled,
       "track" -> value.track)
   }
+
+  def enabledRequests(implicit db: DB, ec: ExecutionContext): Future[List[TwitterRequest]] =
+    items
+      .find($doc("disabled" $ne true))
+      .cursor[TwitterRequest]
+      .collect[List]()
 }
