@@ -8,8 +8,8 @@ import aspect.domain.TwitterRequest
 import aspect.mongo.TwitterRequestCollection
 import reactivemongo.api.DB
 
-case object GetForwardRequest
-case class ForwardRequest(request: Option[TwitterRequest])
+case object GetTwitterRequests
+case class TwitterRequests(items: List[TwitterRequest])
 
 object TwitterRequestRepository extends NodeSingleton[TwitterRequestRepository]
 
@@ -22,6 +22,6 @@ class TwitterRequestRepository extends BaseActor {
 
   def receive = {
     case Start => ensureIndexes
-    case GetForwardRequest => getForwardRequest.map(ForwardRequest).pipeTo(sender())
+    case GetTwitterRequests => all.map(TwitterRequests).pipeTo(sender())
   }
 }

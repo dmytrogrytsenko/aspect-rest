@@ -2,11 +2,13 @@ package aspect.mongo
 
 import aspect.common.mongo.MongoCollection
 import aspect.domain._
+import aspect.mongo.UserCollection._
 import org.joda.time.DateTime
+import reactivemongo.api.DB
 import reactivemongo.bson._
 import reactivemongo.extensions.dao.Handlers._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
 object TwitterRequestCollection extends MongoCollection[TwitterRequestId, TwitterRequest] {
@@ -151,6 +153,4 @@ object TwitterRequestCollection extends MongoCollection[TwitterRequestId, Twitte
       "disabled" -> value.disabled,
       "track" -> value.track)
   }
-
-  def getForwardRequest: Future[Option[TwitterRequest]] = ???
 }

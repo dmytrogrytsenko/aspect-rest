@@ -23,6 +23,10 @@ trait MongoCollection[TId, TEntity] extends BsonDsl {
     def write(value: Duration) = BSONString(value.toString)
   }
 
+  def $asc(field: String) = $doc(field -> 1)
+
+  def $desc(field: String) = $doc(field -> -1)
+
   /* Source: https://github.com/hmrc/simple-reactivemongo/blob/master/src/main/scala/uk/gov/hmrc/mongo/ExtraBSONHandlers.scala */
   implicit def MapBSONReader[T](implicit reader: BSONReader[_ <: BSONValue, T]): BSONDocumentReader[Map[String, T]] =
     new BSONDocumentReader[Map[String, T]] {
