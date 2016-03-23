@@ -4,63 +4,37 @@ import akka.actor.Stash
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.domain.{TwitterRequestId, TwitterRequest}
-import aspect.repositories.{UpdateTwitterRequest, EnabledTwitterRequests, GetEnabledTwitterRequests, TwitterRequestRepository}
-import org.joda.time.DateTime
-
-case object GetForwardRequest
-case class ForwardRequest(request: Option[TwitterRequest])
-
-case object GetBackwardRequest
-case class BackwardRequest(request: Option[TwitterRequest])
+import aspect.domain.{GetTwitterRequest, TwitterQueryId, TwitterQuery}
+import aspect.repositories.{UpdateTwitterQuery, EnabledTwitterQueries, GetEnabledTwitterQueries, TwitterQueryRepository}
 
 class TwitterRequestSource extends BaseActor with Stash {
-  private var requests: Map[TwitterRequestId, TwitterRequest] = Map.empty
+  private var queries: Map[TwitterQueryId, TwitterQuery] = Map.empty
 
   def receive = {
     case Start =>
-      TwitterRequestRepository.endpoint !! GetEnabledTwitterRequests
-    case EnabledTwitterRequests(items) =>
-      this.requests = items.map(request => request.id -> request).toMap
+      TwitterQueryRepository.endpoint !! GetEnabledTwitterQueries
+    case EnabledTwitterQueries(items) =>
+      this.queries = items.map(request => request.id -> request).toMap
       become(processing)
       unstashAll()
-    case _ => stash()
+    case _ =>
+      stash()
   }
 
   def processing: Receive = {
-    case GetForwardRequest =>
-      getForwardRequest map { request =>
-        val changedRequest = request
-        changedRequest
-      } map {
-        updateRequest
-      } pipe { request =>
-        sender() !! ForwardRequest(request)
-      }
-    case GetBackwardRequest =>
-      getBackwardRegular map { request =>
-        val changedRequest = request
-        changedRequest
-      } map {
-        updateRequest
-      } pipe { request =>
-        sender() !! BackwardRequest(request)
-      }
+    case GetTwitterRequest => ???
   }
 
-  def getForwardRequest: Option[TwitterRequest] =
-    getForwardInitial orElse getForwardPending orElse getForwardRegular orElse getForwardOldest
-
-  def getForwardInitial: Option[TwitterRequest] =
-    requests
+  def getForwardInitial: Option[TwitterQuery] =
+    queries
       .values
       .filter(_.isInitial)
       .toList
       .sortBy(_.track.createTime)
       .headOption
 
-  def getForwardRegular: Option[TwitterRequest] =
-    requests
+  def getForwardRegular: Option[TwitterQuery] =
+    queries
       .values
       .filterNot(_.isInitial)
       .filterNot(_.isPending)
@@ -70,8 +44,8 @@ class TwitterRequestSource extends BaseActor with Stash {
       .sortBy(_.forward.map(_.nextTime))
       .headOption
 
-  def getForwardPending: Option[TwitterRequest] =
-    requests
+  def getForwardPending: Option[TwitterQuery] =
+    queries
       .values
       .filterNot(_.isInitial)
       .filter(_.isPending)
@@ -80,8 +54,8 @@ class TwitterRequestSource extends BaseActor with Stash {
       .sortBy(_.track.lastUpdateTime)
       .headOption
 
-  def getForwardOldest: Option[TwitterRequest] =
-    requests
+  def getForwardOldest: Option[TwitterQuery] =
+    queries
       .values
       .filterNot(_.isInitial)
       .filterNot(_.isPending)
@@ -90,8 +64,8 @@ class TwitterRequestSource extends BaseActor with Stash {
       .sortBy(_.track.lastUpdateTime)
       .headOption
 
-  def getBackwardRegular: Option[TwitterRequest] =
-    requests
+  def getBackwardRegular: Option[TwitterQuery] =
+    queries
       .values
       .filterNot(_.isInitial)
       .filterNot(_.isBackwardCompleted)
@@ -101,9 +75,9 @@ class TwitterRequestSource extends BaseActor with Stash {
       .sortBy(_.backward.map(_.nextTime))
       .headOption
 
-  def updateRequest(request: TwitterRequest): TwitterRequest = {
-    TwitterRequestRepository.endpoint !! UpdateTwitterRequest(request)
-    this.requests += request.id -> request
-    request
+  def updateQuery(query: TwitterQuery): TwitterQuery = {
+    TwitterQueryRepository.endpoint !! UpdateTwitterQuery(query)
+    this.queries += query.id -> query
+    query
   }
 }

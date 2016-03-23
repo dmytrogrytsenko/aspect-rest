@@ -5,42 +5,42 @@ import org.joda.time.DateTime
 
 import scala.concurrent.duration.Duration
 
-case class TwitterRequestId(underlying: String) extends AnyVal
+case class TwitterQueryId(underlying: String) extends AnyVal
 
-case class TwitterExecutionId(underlying: String) extends AnyVal
+case class TwitterRequestId(underlying: String) extends AnyVal
 
 case class TrackInfo(version: Long, createTime: DateTime, lastUpdateTime: DateTime)
 
-case class TweetPoint(id: String, time: DateTime)
+case class TweetPoint(id: Long, time: DateTime)
 case class TweetRange(min: TweetPoint, max: TweetPoint)
 
 case class LastError(count: Int, message: String)
 
-case class LastExecution(id: TwitterExecutionId,
-                         startTime: DateTime,
-                         finishTime: DateTime,
-                         duration: Duration,
-                         error: Option[LastError])
+case class LastRequest(id: TwitterRequestId,
+                       startTime: DateTime,
+                       finishTime: DateTime,
+                       duration: Duration,
+                       error: Option[LastError])
 
-case class CurrentExecution(id: TwitterExecutionId, startTime: DateTime)
+case class CurrentRequest(id: TwitterRequestId, startTime: DateTime)
 
-case class ProcessingInfo(last: Option[LastExecution],
-                          current: Option[CurrentExecution],
+case class ProcessingInfo(last: Option[LastRequest],
+                          current: Option[CurrentRequest],
                           nextTime: DateTime,
                           successInterval: Duration,
                           errorInterval: Duration) {
   def executing = current.isDefined
 }
 
-case class TwitterRequest(id: TwitterRequestId,
-                          query: String,
-                          found: Option[TweetRange],
-                          pending: Option[TweetRange],
-                          forward: Option[ProcessingInfo],
-                          backward: Option[ProcessingInfo],
-                          backwardCompleted: Option[Boolean],
-                          disabled: Option[Boolean],
-                          track: TrackInfo) {
+case class TwitterQuery(id: TwitterQueryId,
+                        query: String,
+                        found: Option[TweetRange],
+                        pending: Option[TweetRange],
+                        forward: Option[ProcessingInfo],
+                        backward: Option[ProcessingInfo],
+                        backwardCompleted: Option[Boolean],
+                        disabled: Option[Boolean],
+                        track: TrackInfo) {
 
   def isInitial = forward.isEmpty
   def isPending = pending.isEmpty
@@ -50,6 +50,24 @@ case class TwitterRequest(id: TwitterRequestId,
   def isForwardNextTimeHasCome = forward.exists(_.nextTime <= DateTime.now)
   def isBackwardNextTimeHasCome = backward.exists(_.nextTime <= DateTime.now)
 }
+
+case class TwitterRequest(id: TwitterRequestId,
+                          query: String,
+                          minTweetId: Option[Long] = None,
+                          maxTweetId: Option[Long] = None,
+                          minTweetTime: Option[DateTime] = None,
+                          limit: Option[Int] = None)
+
+case class TwitterRequestResult(minTweetId: Long,
+                                minTweetTime: DateTime,
+                                maxTweetId: Long,
+                                maxTweetTime: DateTime,
+                                count: Int)
+
+case object GetTwitterRequest
+case object NoTwitterRequest
+case class TwitterRequestCompleted(request: TwitterRequest, result: TwitterRequestResult)
+case class TwitterRequestFailed(request: TwitterRequest, error: String)
 
 /*
 {

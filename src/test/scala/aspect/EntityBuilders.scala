@@ -18,7 +18,7 @@ trait EntityBuilders {
   def randomDuration: Duration = Duration.fromNanos(randomLong(60000000))
   def randomOption[T](value: => T) = if (randomBoolean) Some(value) else None
 
-  def buildTweetPoint(id: String = randomString,
+  def buildTweetPoint(id: Long = randomLong(1000),
                       time: DateTime = randomDateTime) =
     TweetPoint(id, time)
 
@@ -30,19 +30,19 @@ trait EntityBuilders {
                      message: String = randomString) =
     LastError(count, message)
 
-  def buildLastExecution(id: TwitterExecutionId = TwitterExecutionId(randomString),
-                         startTime: DateTime = randomDateTime,
-                         finishTime: DateTime = randomDateTime,
-                         duration: Duration = randomDuration,
-                         error: Option[LastError] = randomOption(buildLastError())) =
-    LastExecution(id, startTime, finishTime, duration, error)
+  def buildLastRequest(id: TwitterRequestId = TwitterRequestId(randomString),
+                       startTime: DateTime = randomDateTime,
+                       finishTime: DateTime = randomDateTime,
+                       duration: Duration = randomDuration,
+                       error: Option[LastError] = randomOption(buildLastError())) =
+    LastRequest(id, startTime, finishTime, duration, error)
 
-  def buildCurrentExecution(id: TwitterExecutionId = TwitterExecutionId(randomString),
-                            startTime: DateTime = randomDateTime) =
-    CurrentExecution(id, startTime)
+  def buildCurrentRequest(id: TwitterRequestId = TwitterRequestId(randomString),
+                          startTime: DateTime = randomDateTime) =
+    CurrentRequest(id, startTime)
 
-  def buildProcessingInfo(last: Option[LastExecution] = randomOption(buildLastExecution()),
-                          current: Option[CurrentExecution] = randomOption(buildCurrentExecution()),
+  def buildProcessingInfo(last: Option[LastRequest] = randomOption(buildLastRequest()),
+                          current: Option[CurrentRequest] = randomOption(buildCurrentRequest()),
                           nextTime: DateTime = randomDateTime,
                           successInterval: Duration = randomDuration,
                           errorInterval: Duration = randomDuration) =
@@ -53,14 +53,14 @@ trait EntityBuilders {
                      lastUpdateTime: DateTime = randomDateTime) =
     TrackInfo(version, createTime, lastUpdateTime)
 
-  def buildTwitterRequest(id: TwitterRequestId = TwitterRequestId(randomString),
-                          query: String = randomString,
-                          found: Option[TweetRange] = randomOption(buildTweetRange()),
-                          pending: Option[TweetRange] = randomOption(buildTweetRange()),
-                          forward: Option[ProcessingInfo] = randomOption(buildProcessingInfo()),
-                          backward: Option[ProcessingInfo] = randomOption(buildProcessingInfo()),
-                          backwardCompleted: Option[Boolean] = randomOption(randomBoolean),
-                          disabled: Option[Boolean] = randomOption(randomBoolean),
-                          track: TrackInfo = buildTrackInfo()): TwitterRequest =
-    TwitterRequest(id, query, found, pending, forward, backward, backwardCompleted, disabled, track)
+  def buildTwitterQuery(id: TwitterQueryId = TwitterQueryId(randomString),
+                        query: String = randomString,
+                        found: Option[TweetRange] = randomOption(buildTweetRange()),
+                        pending: Option[TweetRange] = randomOption(buildTweetRange()),
+                        forward: Option[ProcessingInfo] = randomOption(buildProcessingInfo()),
+                        backward: Option[ProcessingInfo] = randomOption(buildProcessingInfo()),
+                        backwardCompleted: Option[Boolean] = randomOption(randomBoolean),
+                        disabled: Option[Boolean] = randomOption(randomBoolean),
+                        track: TrackInfo = buildTrackInfo()): TwitterQuery =
+    TwitterQuery(id, query, found, pending, forward, backward, backwardCompleted, disabled, track)
 }
