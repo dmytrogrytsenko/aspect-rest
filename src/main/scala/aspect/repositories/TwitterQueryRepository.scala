@@ -10,7 +10,7 @@ import reactivemongo.api.DB
 
 case object GetEnabledTwitterQueries
 case class EnabledTwitterQueries(items: List[TwitterQuery])
-case class UpdateTwitterQuery(request: TwitterQuery)
+case class UpdateTwitterQuery(query: TwitterQuery)
 
 object TwitterQueryRepository extends NodeSingleton[TwitterQueryRepository]
 
@@ -24,6 +24,6 @@ class TwitterQueryRepository extends BaseActor {
   def receive = {
     case Start => ensureIndexes
     case GetEnabledTwitterQueries => enabledQueries.map(EnabledTwitterQueries).pipeTo(sender())
-    case UpdateTwitterQuery(request) => update(request.id, request)
+    case UpdateTwitterQuery(query) => update(query.id, query)
   }
 }

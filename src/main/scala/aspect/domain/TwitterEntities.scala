@@ -9,6 +9,10 @@ case class TwitterQueryId(underlying: String) extends AnyVal
 
 case class TwitterRequestId(underlying: String) extends AnyVal
 
+object TwitterRequestId {
+  def generate = TwitterRequestId(newUUID)
+}
+
 case class TrackInfo(version: Long, createTime: DateTime, lastUpdateTime: DateTime)
 
 case class TweetPoint(id: Long, time: DateTime)
@@ -32,32 +36,6 @@ case class ProcessingInfo(last: Option[LastRequest],
   def executing = current.isDefined
 }
 
-case class TwitterQuery(id: TwitterQueryId,
-                        query: String,
-                        found: Option[TweetRange],
-                        pending: Option[TweetRange],
-                        forward: Option[ProcessingInfo],
-                        backward: Option[ProcessingInfo],
-                        backwardCompleted: Option[Boolean],
-                        disabled: Option[Boolean],
-                        track: TrackInfo) {
-
-  def isInitial = forward.isEmpty
-  def isPending = pending.isEmpty
-  def isForwardExecuting = forward.exists(_.current.isEmpty)
-  def isBackwardExecuting = backward.exists(_.current.isEmpty)
-  def isBackwardCompleted = backwardCompleted.contains(true)
-  def isForwardNextTimeHasCome = forward.exists(_.nextTime <= DateTime.now)
-  def isBackwardNextTimeHasCome = backward.exists(_.nextTime <= DateTime.now)
-}
-
-case class TwitterRequest(id: TwitterRequestId,
-                          query: String,
-                          minTweetId: Option[Long] = None,
-                          maxTweetId: Option[Long] = None,
-                          minTweetTime: Option[DateTime] = None,
-                          limit: Option[Int] = None)
-
 case class TwitterRequestResult(minTweetId: Long,
                                 minTweetTime: DateTime,
                                 maxTweetId: Long,
@@ -66,8 +44,14 @@ case class TwitterRequestResult(minTweetId: Long,
 
 case object GetTwitterRequest
 case object NoTwitterRequest
-case class TwitterRequestCompleted(request: TwitterRequest, result: TwitterRequestResult)
-case class TwitterRequestFailed(request: TwitterRequest, error: String)
+
+case class TwitterRequestCompleted(queryId: TwitterQueryId,
+                                   requestId: TwitterRequestId,
+                                   result: TwitterRequestResult)
+
+case class TwitterRequestFailed(queryId: TwitterQueryId,
+                                requestId: TwitterRequestId,
+                                error: String)
 
 /*
 {
