@@ -6,10 +6,16 @@ import akka.actor.Stash
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.domain._
+import aspect.domain.twitter.TwitterSearchBalanceRoute.{Adaptive, Oldest, Backward}
+import aspect.domain.twitter.{TwitterQuery, TwitterSearchResponse, TwitterSearchRequestId, TwitterQueryPool}
 import aspect.repositories._
 
+case object GetTwitterSearchRequest
+case object NoTwitterSearchRequest
+case class TwitterSearchRequestFailed(requestId: TwitterSearchRequestId, error: String)
+
 class TwitterRequestSource extends BaseActor with Stash {
+  private val settings = TwitterSearchSettings(context.system)
   private var queries = TwitterQueryPool.empty
 
   def receive = {
@@ -24,69 +30,48 @@ class TwitterRequestSource extends BaseActor with Stash {
   }
 
   def processing: Receive = {
-    case GetTwitterRequest =>
-      handle.map(update).getOrElse(NoTwitterRequest).pipe(sender() !! _)
-    case TwitterRequestCompleted(queryId, requestId, result) =>
-      queries
-        .items
-        .get(queryId)
-        .filter(query => query.forward.exists(_.current.exists(_.id == requestId)))
-        .foreach { query =>
-
-      }
-    case TwitterRequestFailed(queryId, requestId, error) =>
-      //
+    case GetTwitterSearchRequest =>
+      startRequest.getOrElse(NoTwitterSearchRequest).pipe(sender() !! _)
+    case response: TwitterSearchResponse => completeRequest(response)
+    case TwitterSearchRequestFailed(requestId, error) => ???
   }
 
-  /*
-            /-> Regular --> Recent --> Backward --> 0
-    Pending --> Oldest --> Backward --> 0
-            \-> Backward --> Regular --> Recent --> 0
-  */
-  def handle = handlePending orElse {
-    selectRequestType match {
-      case Regular => handleRegular orElse handleRecent orElse handleBackward
-      case Oldest => handleOldest orElse handleBackward
-      case Backward => handleBackward orElse handleRegular orElse handleRecent
+  def completeRequest(response: TwitterSearchResponse) = {
+    lazy val forward = queries.findForward(response.requestId).map(_.completeForwardRequest(response))
+    lazy val backward = queries.findBackward(response.requestId).map(_.completeBackwardRequest(response))
+    forward orElse backward foreach { updatedQuery =>
+      this.queries += updatedQuery
+      TwitterQueryRepository.endpoint !! UpdateTwitterQuery(updatedQuery)
     }
   }
 
-  def handlePending = queries.nextPending
-    .map(query => query -> TwitterRequest.pending(query))
-    .map { case (query, request) => request -> query.startForwardRequest(request) }
+  /*
+            /-> ForwardAdaptive --> Backward
+    Pending --> ForwardOldest --> Backward
+            \-> Backward --> ForwardAdaptive
+  */
+  def startRequest =
+    handlePending orElse {
+      selectBalanceRoute match {
+        case Adaptive => handleAdaptive orElse handleBackward
+        case Oldest => handleOldest orElse handleBackward
+        case Backward => handleBackward orElse handleAdaptive
+      }
+    } map { case (request, updatedQuery) =>
+      this.queries += updatedQuery
+      TwitterQueryRepository.endpoint !! UpdateTwitterQuery(updatedQuery)
+      request
+    }
 
-  def handleRegular = queries.nextRegular
-    .map(query => query -> TwitterRequest.forward(query))
-    .map { case (query, request) => request -> query.startForwardRequest(request) }
+  def handlePending = queries.nextPending.map(_.startForwardRequest)
+  def handleAdaptive = queries.nextAdaptive.map(_.startForwardRequest)
+  def handleOldest = queries.nextOldest.map(_.startForwardRequest)
+  def handleBackward = queries.nextBackward.map(_.startBackwardRequest)
 
-  def handleRecent = queries.nextRecent
-    .map(query => query -> TwitterRequest.forward(query))
-    .map { case (query, request) => request -> query.startForwardRequest(request) }
-
-  def handleOldest = queries.nextOldest
-    .map(query => query -> TwitterRequest.forward(query))
-    .map { case (query, request) => request -> query.startForwardRequest(request) }
-
-  def handleBackward = queries.nextBackward
-    .map(query => query -> TwitterRequest.backward(query))
-    .map { case (query, request) => request -> query.startBackwardRequest(request) }
-
-  def update(pair: (TwitterRequest, TwitterQuery)): TwitterRequest = {
-    val (request, updatedQuery) = pair
-    this.queries += updatedQuery
-    TwitterQueryRepository.endpoint !! UpdateTwitterQuery(updatedQuery)
-    request
-  }
-
-  sealed trait RequestType
-  case object Regular extends RequestType
-  case object Oldest extends RequestType
-  case object Backward extends RequestType
-
-  def selectRequestType = {
-    def randomInt(bound: Int) = ThreadLocalRandom.current().nextInt(bound)
-    val distribution = List(Regular -> 80, Oldest -> 90, Backward -> 100)
-    val hit = randomInt(100)
-    distribution.filterNot(_._2 < hit).headOption.getOrElse(Regular)
-  }
+  def selectBalanceRoute =
+    randomInt(3) match {
+      case 0 => Adaptive
+      case 1 => Oldest
+      case 2 => Backward
+    }
 }

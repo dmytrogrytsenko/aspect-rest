@@ -2,7 +2,7 @@ package aspect.mongo
 
 import aspect.common.mongo.MongoCollection
 import aspect.domain._
-import aspect.mongo.UserCollection._
+import aspect.domain.twitter._
 import org.joda.time.DateTime
 import reactivemongo.api.DB
 import reactivemongo.bson._
@@ -22,12 +22,12 @@ object TwitterQueryCollection extends MongoCollection[TwitterQueryId, TwitterQue
     def write(value: TwitterQueryId): BSONString = BSONString(value.underlying)
   }
 
-  implicit object witterRequestIdReader extends BSONReader[BSONString, TwitterRequestId] {
-    def read(bson: BSONString): TwitterRequestId = TwitterRequestId(bson.value)
+  implicit object TwitterSearchRequestIdReader extends BSONReader[BSONString, TwitterSearchRequestId] {
+    def read(bson: BSONString): TwitterSearchRequestId = TwitterSearchRequestId(bson.value)
   }
 
-  implicit object witterRequestIdWriter extends BSONWriter[TwitterRequestId, BSONString] {
-    def write(value: TwitterRequestId): BSONString = BSONString(value.underlying)
+  implicit object TwitterSearchRequestIdWriter extends BSONWriter[TwitterSearchRequestId, BSONString] {
+    def write(value: TwitterSearchRequestId): BSONString = BSONString(value.underlying)
   }
 
   implicit object TweetPointReader extends BSONDocumentReader[TweetPoint] {
@@ -68,7 +68,7 @@ object TwitterQueryCollection extends MongoCollection[TwitterQueryId, TwitterQue
 
   implicit object LastRequestReader extends BSONDocumentReader[LastRequest] {
     def read(doc: BSONDocument) = LastRequest(
-      id = doc.getAs[TwitterRequestId]("id").get,
+      id = doc.getAs[TwitterSearchRequestId]("id").get,
       startTime = doc.getAs[DateTime]("startTime").get,
       finishTime = doc.getAs[DateTime]("finishTime").get,
       duration = doc.getAs[Duration]("duration").get,
@@ -86,7 +86,7 @@ object TwitterQueryCollection extends MongoCollection[TwitterQueryId, TwitterQue
 
   implicit object CurrentRequestReader extends BSONDocumentReader[CurrentRequest] {
     def read(doc: BSONDocument) = CurrentRequest(
-      id = doc.getAs[TwitterRequestId]("id").get,
+      id = doc.getAs[TwitterSearchRequestId]("id").get,
       startTime = doc.getAs[DateTime]("startTime").get)
   }
 

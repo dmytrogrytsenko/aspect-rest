@@ -2,6 +2,7 @@ package aspect
 
 import java.security.MessageDigest
 import java.util.UUID
+import java.util.concurrent.ThreadLocalRandom
 
 import akka.actor._
 import akka.cluster.{Cluster, MemberStatus}
@@ -19,6 +20,7 @@ import scala.util.Failure
 package object common {
 
   def newUUID = UUID.randomUUID().toString
+  def randomInt(bound: Int) = ThreadLocalRandom.current().nextInt(bound)
 
   def digest(algorithm: String, value: String) =
     MessageDigest
@@ -51,9 +53,18 @@ package object common {
     def toShard = Shard(adler32sum(sha256(value)) % Shard.count)
   }
 
+  implicit class OptionIdOps[T](value: T) {
+    def some: Option[T] = Some(value)
+  }
+
   implicit class PipedObject[T](value: T) {
-    def |>[R] (f: T => R) = f(this.value)
-    def pipe[R](f: T => R) = |>(f)
+    def ~>[R] (f: T => R) = f(this.value)
+    def pipe[R](f: T => R) = ~>(f)
+  }
+
+  implicit class PipedFunc[T, R](f: T => R) {
+    def <~[Z](v: Z => T): Z => R = x => f(v(x))
+    def <~(v: T): R = f(v)
   }
 
   def normalizeAskResult(msg: Any): Future[Any] = msg match {

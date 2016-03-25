@@ -1,4 +1,4 @@
-package aspect.domain
+package aspect.domain.twitter
 
 import aspect.common._
 
@@ -11,6 +11,12 @@ object TwitterQueryPool {
 
 case class TwitterQueryPool(items: Map[TwitterQueryId, TwitterQuery]) {
   def +(query: TwitterQuery) = copy(items = items + (query.id -> query))
+
+  def findForward(requestId: TwitterSearchRequestId) =
+    items.values.find(q => q.forward.exists(_.currentRequestId == requestId))
+
+  def findBackward(requestId: TwitterSearchRequestId) =
+    items.values.find(q => q.backward.exists(_.currentRequestId == requestId))
 
   def nextPending: Option[TwitterQuery] =
     items
@@ -30,26 +36,14 @@ case class TwitterQueryPool(items: Map[TwitterQueryId, TwitterQuery]) {
       .sortBy(_.track.createTime)
       .headOption
 
-  def nextRegular: Option[TwitterQuery] =
+  def nextAdaptive: Option[TwitterQuery] =
     items
       .values
       .filterNot(_.isInitial)
       .filterNot(_.isPending)
       .filterNot(_.isForwardExecuting)
-      .filter(_.isForwardNextTimeHasCome)
       .toList
       .sortBy(_.forward.map(_.nextTime))
-      .headOption
-
-  def nextRecent: Option[TwitterQuery] =
-    items
-      .values
-      .filterNot(_.isInitial)
-      .filterNot(_.isPending)
-      .filterNot(_.isForwardExecuting)
-      .toList
-      .sortBy(_.track.lastUpdateTime)
-      .reverse
       .headOption
 
   def nextOldest: Option[TwitterQuery] =
@@ -68,7 +62,6 @@ case class TwitterQueryPool(items: Map[TwitterQueryId, TwitterQuery]) {
       .filterNot(_.isInitial)
       .filterNot(_.isBackwardCompleted)
       .filterNot(_.isBackwardExecuting)
-      .filter(_.isBackwardNextTimeHasCome)
       .toList
       .sortBy(_.backward.map(_.nextTime))
       .headOption

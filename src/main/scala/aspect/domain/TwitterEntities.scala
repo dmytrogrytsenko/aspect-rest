@@ -1,58 +1,5 @@
 package aspect.domain
 
-import aspect.common._
-import org.joda.time.DateTime
-
-import scala.concurrent.duration.Duration
-
-case class TwitterQueryId(underlying: String) extends AnyVal
-
-case class TwitterRequestId(underlying: String) extends AnyVal
-
-object TwitterRequestId {
-  def generate = TwitterRequestId(newUUID)
-}
-
-case class TrackInfo(version: Long, createTime: DateTime, lastUpdateTime: DateTime)
-
-case class TweetPoint(id: Long, time: DateTime)
-case class TweetRange(min: TweetPoint, max: TweetPoint)
-
-case class LastError(count: Int, message: String)
-
-case class LastRequest(id: TwitterRequestId,
-                       startTime: DateTime,
-                       finishTime: DateTime,
-                       duration: Duration,
-                       error: Option[LastError])
-
-case class CurrentRequest(id: TwitterRequestId, startTime: DateTime)
-
-case class ProcessingInfo(last: Option[LastRequest],
-                          current: Option[CurrentRequest],
-                          nextTime: DateTime,
-                          successInterval: Duration,
-                          errorInterval: Duration) {
-  def executing = current.isDefined
-}
-
-case class TwitterRequestResult(minTweetId: Long,
-                                minTweetTime: DateTime,
-                                maxTweetId: Long,
-                                maxTweetTime: DateTime,
-                                count: Int)
-
-case object GetTwitterRequest
-case object NoTwitterRequest
-
-case class TwitterRequestCompleted(queryId: TwitterQueryId,
-                                   requestId: TwitterRequestId,
-                                   result: TwitterRequestResult)
-
-case class TwitterRequestFailed(queryId: TwitterQueryId,
-                                requestId: TwitterRequestId,
-                                error: String)
-
 /*
 {
   "_id": "<md5 of query>",

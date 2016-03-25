@@ -4,7 +4,7 @@ import aspect.common._
 import aspect.common.actors.{BaseActor, NodeSingleton}
 import aspect.common.Messages.Start
 import aspect.common.mongo.MongoStorage
-import aspect.domain.TwitterQuery
+import aspect.domain.twitter.TwitterQuery
 import aspect.mongo.TwitterQueryCollection
 import reactivemongo.api.DB
 
