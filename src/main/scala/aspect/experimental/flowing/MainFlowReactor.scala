@@ -2,7 +2,6 @@ package aspect.experimental.flowing
 
 import akka.actor.{ActorRef, Props, ActorContext}
 import aspect.common._
-import aspect.common.flowing.{Operation, Reactor, FlowReactor}
 
 case class MainFlow(name: String, underlying: ActorRef) extends Reactor
 

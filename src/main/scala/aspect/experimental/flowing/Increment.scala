@@ -3,8 +3,7 @@ package aspect.experimental.flowing
 import akka.actor.{ActorContext, Props}
 import aspect.common.Messages.Start
 import aspect.common.actors.SingleUseActor
-import aspect.common.flowing.Messages.Message
-import aspect.common.flowing.Operation
+import Messages.Message
 
 object Increment {
   def create(implicit context: ActorContext) =

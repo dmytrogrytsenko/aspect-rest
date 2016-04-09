@@ -1,13 +1,11 @@
 package aspect.processors
 
-import java.util.concurrent.ThreadLocalRandom
-
 import akka.actor.Stash
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
 import aspect.domain.twitter.TwitterSearchBalanceRoute.{Adaptive, Oldest, Backward}
-import aspect.domain.twitter.{TwitterQuery, TwitterSearchResponse, TwitterSearchRequestId, TwitterQueryPool}
+import aspect.domain.twitter.{TwitterSearchResponse, TwitterSearchRequestId, TwitterQueryPool}
 import aspect.repositories._
 
 case object GetTwitterSearchRequest

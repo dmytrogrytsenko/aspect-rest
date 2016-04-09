@@ -1,4 +1,4 @@
-package aspect.common.flowing
+package aspect.experimental.flowing
 
 import akka.actor.{Actor, ActorContext}
 import aspect.common._

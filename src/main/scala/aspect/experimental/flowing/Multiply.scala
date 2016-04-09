@@ -4,8 +4,7 @@ import akka.actor.{ActorRef, ActorContext, Props}
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.common.flowing.Messages._
-import aspect.common.flowing._
+import Messages._
 
 case class Multiply(name: String, underlying: ActorRef, input1: Input[Int], input2: Input[Int], output: Output[Int])
   extends Reactor with DefaultOutput[Int]

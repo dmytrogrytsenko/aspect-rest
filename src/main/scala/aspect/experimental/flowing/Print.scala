@@ -4,8 +4,7 @@ import akka.actor.{ActorRef, Props, ActorContext}
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.common.flowing._
-import aspect.common.flowing.Messages._
+import Messages._
 
 case class Print(name: String, underlying: ActorRef, input: Input[Int])
   extends Reactor with DefaultInput[Int]

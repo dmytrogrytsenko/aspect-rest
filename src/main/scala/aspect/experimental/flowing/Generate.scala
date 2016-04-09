@@ -4,8 +4,7 @@ import akka.actor.{ActorRef, Props, ActorContext}
 import aspect.common._
 import aspect.common.Messages.Start
 import aspect.common.actors.BaseActor
-import aspect.common.flowing.Messages._
-import aspect.common.flowing.{Reactor, Endpoint, Output, DefaultOutput}
+import Messages._
 
 case class Generate(name: String, underlying: ActorRef, output: Output[Int])
   extends Reactor with DefaultOutput[Int]

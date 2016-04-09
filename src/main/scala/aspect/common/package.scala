@@ -2,7 +2,7 @@ package aspect
 
 import java.security.MessageDigest
 import java.util.UUID
-import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.{TimeUnit, ThreadLocalRandom}
 
 import akka.actor._
 import akka.cluster.{Cluster, MemberStatus}
@@ -83,6 +83,7 @@ package object common {
     def <=(operand: DateTime): Boolean = !value.isAfter(operand)
     def +(operand: FiniteDuration): DateTime = value plusMillis operand.toMillis.toInt
     def -(operand: FiniteDuration): DateTime = value minusMillis operand.toMillis.toInt
+    def -(operand: DateTime): FiniteDuration = FiniteDuration(value.getMillis - operand.getMillis, TimeUnit.MILLISECONDS)
     def min(operand: DateTime): DateTime = if (value < operand) value else operand
     def max(operand: DateTime): DateTime = if (value > operand) value else operand
   }

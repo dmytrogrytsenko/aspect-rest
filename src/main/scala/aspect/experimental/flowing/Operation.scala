@@ -1,10 +1,10 @@
-package aspect.common.flowing
+package aspect.experimental.flowing
 
 import akka.actor._
-import aspect.common._
 import aspect.common.Messages.Start
+import aspect.common._
 import aspect.common.actors.BaseActor
-import aspect.common.flowing.Messages._
+import aspect.experimental.flowing.Messages._
 
 import scala.concurrent.duration._
 
