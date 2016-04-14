@@ -3,18 +3,19 @@ package aspect.common.actors
 import akka.actor._
 import aspect.common._
 import aspect.common.Messages.Start
-import aspect.common.settings.Settings
+import aspect.common.config.Settings
+import com.typesafe.config.Config
 import org.joda.time.DateTime
 
 import scala.concurrent.duration._
 
 object Repeater {
-  def props(settings: RepeaterSettings, factory: Settings => Props) =
+  def props(settings: RepeaterSettings, factory: Config => Props) =
     Props(classOf[Repeater], settings, factory)
 }
 
 class Repeater(settings: RepeaterSettings,
-               factory: Settings => Props) extends SingleUseActor {
+               factory: Config => Props) extends SingleUseActor {
   case object Execute
 
   def receive = {
@@ -46,5 +47,5 @@ trait RepeaterSettings extends Settings {
   def initialInterval = get[Option[FiniteDuration]]("initialInterval").getOrElse(Duration.Zero)
   def interval = get[FiniteDuration]("interval")
   def timeout = get[FiniteDuration]("timeout")
-  def operation = get[Settings]("operation")
+  def operation = get[Config]("operation")
 }

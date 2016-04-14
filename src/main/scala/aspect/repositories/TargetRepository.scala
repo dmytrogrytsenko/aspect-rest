@@ -2,8 +2,7 @@ package aspect.repositories
 
 import aspect.common._
 import aspect.common.Messages.Start
-import aspect.common.actors.{BaseActor, NodeSingleton}
-import aspect.common.mongo.MongoStorage
+import aspect.common.actors.{NodeSingleton1, BaseActor}
 import aspect.domain.{ProjectId, TargetId, Target}
 import aspect.mongo.TargetCollection
 import reactivemongo.api.DB
@@ -24,14 +23,12 @@ case class TargetRemoved(targetId: TargetId)
 case class UpdateTarget(targetId: TargetId, name: Option[String], keywords: Option[String])
 case class TargetUpdated(targetId: TargetId)
 
-object TargetRepository extends NodeSingleton[TargetRepository]
+object TargetRepository extends NodeSingleton1[TargetRepository, DB]
 
-class TargetRepository extends BaseActor {
+class TargetRepository(implicit val db: DB) extends BaseActor {
 
   import TargetCollection._
   import context.dispatcher
-
-  implicit val db: DB = MongoStorage.connect.db("aspect")
 
   def receive = {
     case Start => ensureIndexes

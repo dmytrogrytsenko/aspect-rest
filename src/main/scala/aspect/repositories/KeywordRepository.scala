@@ -1,19 +1,16 @@
 package aspect.repositories
 
 import aspect.common.Messages.Start
-import aspect.common.actors.{BaseActor, NodeSingleton}
-import aspect.common.mongo.MongoStorage
+import aspect.common.actors.{NodeSingleton1, BaseActor}
 import aspect.mongo.KeywordCollection
 import reactivemongo.api.DB
 
-object KeywordRepository extends NodeSingleton[KeywordRepository]
+object KeywordRepository extends NodeSingleton1[TargetRepository, DB]
 
-class KeywordRepository extends BaseActor {
+class KeywordRepository(implicit val db: DB) extends BaseActor {
 
   import KeywordCollection._
   import context.dispatcher
-
-  implicit val db: DB = MongoStorage.connect.db("aspect")
 
   def receive = {
     case Start => ensureIndexes

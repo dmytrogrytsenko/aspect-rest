@@ -1,6 +1,5 @@
 package aspect.domain.twitter
 
-import aspect.common._
 import aspect.domain.TrackInfo
 import org.joda.time.DateTime
 

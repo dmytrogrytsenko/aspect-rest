@@ -5,17 +5,16 @@ import akka.actor.Status.Failure
 import akka.util.Timeout
 import aspect.common._
 import aspect.common.Messages.Start
-import aspect.common.actors.{BaseActor, ClusterSingleton}
-import aspect.common.mongo.MongoStorage
+import aspect.common.actors.{ClusterSingleton1, BaseActor}
 import aspect.domain._
-import aspect.mongo.{KeywordCollection, TargetCollection, ProjectCollection, UserCollection}
+import aspect.mongo.{KeywordCollection, TargetCollection}
 import reactivemongo.api.DB
 
 import scala.concurrent.duration._
 
-object KeywordsPreparer extends ClusterSingleton[KeywordsPreparer]
+object KeywordsPreparer extends ClusterSingleton1[KeywordsPreparer, DB]
 
-class KeywordsPreparer extends BaseActor {
+class KeywordsPreparer(implicit val db: DB) extends BaseActor {
 
   case class Loaded(targets: Set[Target], keywords: Set[Keyword])
 
@@ -27,8 +26,6 @@ class KeywordsPreparer extends BaseActor {
   val successInterval = 1.minute
   val failureInterval = 1.minute
   val receiveTimeout = 2.minute
-
-  implicit val db: DB = MongoStorage.connect.db("aspect")
 
   context.setReceiveTimeout(receiveTimeout)
 
@@ -46,7 +43,7 @@ class KeywordsPreparer extends BaseActor {
       } yield word -> target
 
       val newKeywords = rows
-        .groupBy(_._1)
+        .groupBy { case (word, _) => word }
         .mapValues(row => Keyword(KeywordId(row.head._1), row.head._1, row.map(_._2.id)))
         .values
         .toSet

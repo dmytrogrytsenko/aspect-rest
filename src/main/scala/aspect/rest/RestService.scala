@@ -1,26 +1,28 @@
 package aspect.rest
 
+import akka.actor.Props
 import akka.actor.SupervisorStrategy._
 import akka.io.IO
 import akka.util.Timeout
 import aspect.common._
-import aspect.common.actors.{BaseActor, NodeSingleton}
+import aspect.common.actors.{NodeSingleton1, BaseActor}
 import aspect.common.Messages.Start
+import aspect.common.config.Settings
 import aspect.routes._
 import spray.can.Http
 import spray.can.Http._
 import spray.routing._
 
-object RestService extends NodeSingleton[RestService]
+import scala.concurrent.duration.FiniteDuration
 
-class RestService extends BaseActor with HttpService with Jasonify
+object RestService extends NodeSingleton1[RestService, RestSettings]
+
+class RestService(settings: RestSettings) extends BaseActor with HttpService with Jasonify
   with WebRoutes
   with UserRoutes
   with ProjectRoutes
   with TargetRoutes
   with FeedRoutes {
-
-  val settings = RestSettings(context.system)
 
   implicit val timeout: Timeout = Timeout(settings.defaultTimeout)
 
@@ -34,4 +36,10 @@ class RestService extends BaseActor with HttpService with Jasonify
   }
 
   override def supervisorStrategy = stoppingStrategy
+}
+
+trait RestSettings extends Settings {
+  val interface = get[String]("interface")
+  val port = get[Int]("port")
+  val defaultTimeout = get[FiniteDuration]("defaultTimeout")
 }

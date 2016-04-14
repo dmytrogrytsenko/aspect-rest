@@ -1,9 +1,8 @@
 package aspect.repositories
 
 import aspect.common._
-import aspect.common.actors.{BaseActor, NodeSingleton}
+import aspect.common.actors.{NodeSingleton1, BaseActor}
 import aspect.common.Messages.Start
-import aspect.common.mongo.MongoStorage
 import aspect.domain.twitter.TwitterQuery
 import aspect.mongo.TwitterQueryCollection
 import reactivemongo.api.DB
@@ -12,14 +11,12 @@ case object GetEnabledTwitterQueries
 case class EnabledTwitterQueries(items: List[TwitterQuery])
 case class UpdateTwitterQuery(query: TwitterQuery)
 
-object TwitterQueryRepository extends NodeSingleton[TwitterQueryRepository]
+object TwitterQueryRepository extends NodeSingleton1[TwitterQueryRepository, DB]
 
-class TwitterQueryRepository extends BaseActor {
+class TwitterQueryRepository(implicit val db: DB) extends BaseActor {
 
   import TwitterQueryCollection._
   import context.dispatcher
-
-  implicit val db: DB = MongoStorage.connect.db("aspect")
 
   def receive = {
     case Start => ensureIndexes
