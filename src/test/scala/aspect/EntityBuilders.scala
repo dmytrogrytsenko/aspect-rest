@@ -4,6 +4,7 @@ import java.util.concurrent.ThreadLocalRandom
 
 import aspect.common._
 import aspect.domain._
+import aspect.domain.twitter._
 import org.joda.time.DateTime
 
 import scala.concurrent.duration.Duration
@@ -30,14 +31,14 @@ trait EntityBuilders {
                      message: String = randomString) =
     LastError(count, message)
 
-  def buildLastRequest(id: TwitterRequestId = TwitterRequestId(randomString),
+  def buildLastRequest(id: TwitterSearchRequestId = TwitterSearchRequestId(randomString),
                        startTime: DateTime = randomDateTime,
                        finishTime: DateTime = randomDateTime,
                        duration: Duration = randomDuration,
                        error: Option[LastError] = randomOption(buildLastError())) =
     LastRequest(id, startTime, finishTime, duration, error)
 
-  def buildCurrentRequest(id: TwitterRequestId = TwitterRequestId(randomString),
+  def buildCurrentRequest(id: TwitterSearchRequestId = TwitterSearchRequestId(randomString),
                           startTime: DateTime = randomDateTime) =
     CurrentRequest(id, startTime)
 

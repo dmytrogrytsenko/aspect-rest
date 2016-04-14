@@ -8,8 +8,9 @@ object Settings {
   def apply(cfg: Config): Settings =
     new Settings { val config = cfg }
 
-  def create[T <: Settings](config: Config)(implicit tag: ClassTag[T]): T =
+  def create[T <: Settings](config: Config)(implicit tag: ClassTag[T]): T = {
     tag.runtimeClass.getConstructor(classOf[Config]).newInstance(config).asInstanceOf[T]
+  }
 }
 
 trait Settings extends BasicReaders {

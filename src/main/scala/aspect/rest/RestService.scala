@@ -1,6 +1,5 @@
 package aspect.rest
 
-import akka.actor.Props
 import akka.actor.SupervisorStrategy._
 import akka.io.IO
 import akka.util.Timeout
@@ -9,6 +8,7 @@ import aspect.common.actors.{NodeSingleton1, BaseActor}
 import aspect.common.Messages.Start
 import aspect.common.config.Settings
 import aspect.routes._
+import com.typesafe.config.Config
 import spray.can.Http
 import spray.can.Http._
 import spray.routing._
@@ -38,7 +38,7 @@ class RestService(settings: RestSettings) extends BaseActor with HttpService wit
   override def supervisorStrategy = stoppingStrategy
 }
 
-trait RestSettings extends Settings {
+case class RestSettings(config: Config) extends Settings {
   val interface = get[String]("interface")
   val port = get[Int]("port")
   val defaultTimeout = get[FiniteDuration]("defaultTimeout")
