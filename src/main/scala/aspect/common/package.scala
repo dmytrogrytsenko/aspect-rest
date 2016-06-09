@@ -20,6 +20,9 @@ import scala.util.Failure
 
 package object common {
 
+  type Tagged[U] = { type Tag = U }
+  type @@[T, U] = T with Tagged[U]
+
   def newUUID = UUID.randomUUID().toString
   def randomInt(bound: Int) = ThreadLocalRandom.current().nextInt(bound)
 
@@ -44,14 +47,17 @@ package object common {
     (b << 16) + a
   }
 
-  case class Shard(underlying: Int) extends AnyVal
+  sealed trait SHARD
+
+  type Shard = Int @@ SHARD
 
   object Shard {
     val count = 1024
+    val all = (0 until count).map(_.asInstanceOf[Shard]).toSet
   }
 
   implicit class RichString(value: String) {
-    def toShard = Shard(adler32sum(sha256(value)) % Shard.count)
+    def toShard = (adler32sum(sha256(value)) % Shard.count).asInstanceOf[Shard]
   }
 
   implicit class OptionIdOps[T](value: T) {

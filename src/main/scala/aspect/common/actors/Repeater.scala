@@ -44,8 +44,8 @@ class Repeater(settings: RepeaterSettings,
 }
 
 trait RepeaterSettings extends Settings {
-  def initialInterval = get[Option[FiniteDuration]]("initialInterval").getOrElse(Duration.Zero)
-  def interval = get[FiniteDuration]("interval")
-  def timeout = get[FiniteDuration]("timeout")
-  def operation = get[Config]("operation")
+  val initialInterval = get[Option[FiniteDuration]]("initialInterval").getOrElse(Duration.Zero)
+  val interval = get[FiniteDuration]("interval")
+  val timeout = get[FiniteDuration]("timeout")
+  val operation = get[Config]("operation")
 }

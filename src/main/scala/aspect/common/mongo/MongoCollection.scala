@@ -7,7 +7,7 @@ import reactivemongo.bson._
 import reactivemongo.extensions.dsl.BsonDsl
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MongoCollection[TId, TEntity] extends BsonDsl {
 
@@ -40,11 +40,11 @@ trait MongoCollection[TId, TEntity] extends BsonDsl {
     }
 
   implicit object ShardReader extends BSONReader[BSONInteger, Shard] {
-    def read(bson: BSONInteger): Shard = Shard(bson.value)
+    def read(bson: BSONInteger): Shard = bson.value.asInstanceOf[Shard]
   }
 
   implicit object ShardWriter extends BSONWriter[Shard, BSONInteger] {
-    def write(value: Shard): BSONInteger = BSONInteger(value.underlying)
+    def write(value: Shard): BSONInteger = BSONInteger(value)
   }
 
   def items(implicit db: DB) = db[BSONCollection](name)
