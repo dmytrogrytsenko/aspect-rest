@@ -41,6 +41,15 @@ trait BasicReaders {
       config.getStringList(name).asScala.toList
   }
 
+  implicit def mapSettingsReader[T](implicit reader: SettingsReader[T]) =
+    new SettingsReader[Map[String, T]] {
+      def read(config: Config, name: String): Map[String, T] = {
+        val cfg = config.getConfig(name)
+        val keys = cfg.entrySet().asScala.map(_.getKey).toSet
+        keys.map(key => key -> reader.read(cfg, key)).toMap
+      }
+    }
+
   implicit def settingsSettingsReader[T <: Settings](implicit tag: ClassTag[T]) =
     new SettingsReader[T] {
       def read(config: Config, name: String): T =
