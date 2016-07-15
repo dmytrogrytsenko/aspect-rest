@@ -49,11 +49,11 @@ class MultiplyReactor extends BaseActor {
   }
 
   def handle(msg1: Message, msg2: Message) = {
-    val value1 = msg1.parts("value").asInstanceOf[Int]
-    val value2 = msg2.parts("value").asInstanceOf[Int]
+    val value1 = msg1.as[Int]
+    val value2 = msg2.as[Int]
     val result = value1 * value2
     val sndId = CorrelationId.generate
-    output !! Send(sndId, Message.create("value" -> result))
+    output !! Send(sndId, Message.create(result))
     become(sending(sndId))
   }
 

@@ -8,16 +8,16 @@ import aspect.experimental.flowing.Messages._
 
 import scala.concurrent.duration._
 
-case class Operation[I, O](name: String, underlying: ActorRef, input: Input[I], output: Output[O])
+case class Operation1[I, O](name: String, underlying: ActorRef, input: Input[I], output: Output[O])
   extends Reactor with DefaultInput[I] with DefaultOutput[O]
 
-object Operation {
+object Operation1 {
   def create[I, O](factory: Message => Props)(implicit context: ActorContext) = {
     val name = this.getClass.getSimpleName
     val underlying = OperationReactor.props(factory).create(name)
     val input = Input.default[I](name)
     val output = Output.default[O](name)
-    Operation(name, underlying, input, output)
+    Operation1(name, underlying, input, output)
   }
 }
 

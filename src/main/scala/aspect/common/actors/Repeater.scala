@@ -15,7 +15,7 @@ object Repeater {
 }
 
 class Repeater(settings: RepeaterSettings,
-               factory: Config => Props) extends SingleUseActor {
+               factory: Config => Props) extends BaseActor {
   case object Execute
 
   def receive = {

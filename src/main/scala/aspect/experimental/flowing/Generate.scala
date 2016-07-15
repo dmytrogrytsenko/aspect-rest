@@ -27,7 +27,7 @@ class GenerateReactor extends BaseActor {
 
   def generate(value: Int) = {
     val id = CorrelationId.generate
-    output !! Send(id, Message.create("value" -> value))
+    output !! Send(id, Message.create(value))
     become(sending(id, value))
   }
 

@@ -9,7 +9,7 @@ import aspect.common.Messages.Start
 import scala.concurrent.duration._
 import scala.util.Try
 
-trait SingleUseActor extends BaseActor {
+trait Operation extends BaseActor {
 
   val receiveTimeout = 5.seconds
 

@@ -43,8 +43,7 @@ class PrintReactor extends BaseActor {
   }
 
   def handle(msg: Message) = {
-    val value = msg.parts("value").asInstanceOf[Int]
-    log.info(s"Value: $value")
+    log.info(s"Value: ${msg.body.toString}")
     Thread.sleep(1000)
   }
 }

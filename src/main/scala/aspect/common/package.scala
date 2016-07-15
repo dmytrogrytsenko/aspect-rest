@@ -56,6 +56,10 @@ package object common {
     val all = (0 until count).map(_.asInstanceOf[Shard]).toSet
   }
 
+  implicit class AnyOps[T](value: T) {
+    def ≠(operand: T) = value != operand
+  }
+
   implicit class RichString(value: String) {
     def toShard = (adler32sum(sha256(value)) % Shard.count).asInstanceOf[Shard]
   }
